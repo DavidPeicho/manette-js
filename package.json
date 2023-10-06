@@ -1,0 +1,35 @@
+{
+  "name": "haptic-js",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "homepage": "https://github.com/DavidPeicho/haptic-js",
+  "repository": "git@github.com:DavidPeicho/haptic-js.git",
+  "author": "David Peicho <david.peicho@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "gamepad",
+    "game",
+    "input",
+    "xr"
+  ],
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "pretty": "prettier --config ./prettierrc.json --write \"src/**/*.ts\"",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@types/webxr": "^0.5.5"
+  }
+}
