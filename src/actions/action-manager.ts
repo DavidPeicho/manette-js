@@ -30,14 +30,14 @@ export class ActionManager {
             const mappings = this._mappings[i];
             action.reset();
             for (const mapping of mappings) {
-                if (!mapping.update(action)) continue;
-                const state = mapping.trigger.update(action);
+                const match = mapping.update(action);
+                const state = mapping.trigger?.update(action);
                 switch (state) {
                     case TriggerState.Completed:
-                        action.completed.notify();
+                        action.completed.notify(action);
                         break;
                 }
-                break;
+                if (!match) break;
             }
         }
     }

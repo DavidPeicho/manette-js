@@ -10,9 +10,9 @@ export enum ActionState {
 export class Action {
     private readonly _name: string;
 
-    started = new Emitter();
-    completed = new Emitter();
-    canceled = new Emitter();
+    started = new Emitter<[Action]>();
+    completed = new Emitter<[Action]>();
+    canceled = new Emitter<[Action]>();
 
     state = ActionState.None;
 

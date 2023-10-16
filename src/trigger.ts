@@ -15,10 +15,25 @@ export interface Trigger {
 export class PressTrigger implements Trigger {
     actuationSq = 0.5;
 
+    private _wasPressed = false;
+
     update(action: Action) {
-        if (action.magnitudeSq() >= this.actuationSq) {
+        const value = action.magnitudeSq();
+        const accuated = value >= this.actuationSq;
+        if (accuated && !this._wasPressed) {
+            this._wasPressed = true;
             return TriggerState.Completed;
         }
+        this._wasPressed = accuated;
         return TriggerState.None;
+    }
+}
+
+export class DownTrigger implements Trigger {
+    actuationSq = 0.5;
+
+    update(action: Action) {
+        const value = action.magnitudeSq();
+        return value >= this.actuationSq ? TriggerState.Completed : TriggerState.None;
     }
 }

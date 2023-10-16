@@ -35,8 +35,7 @@ export class BooleanMapping extends Mapping {
     }
 
     update(action: BooleanAction): boolean {
-        if (!this.source.pressed(this.buttons)) return false;
-        action.value = true;
-        return true;
+        action.value = this.source.pressed(this.buttons);
+        return action.value;
     }
 }
