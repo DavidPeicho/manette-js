@@ -1,3 +1,3 @@
 export interface InputSource {
-    pressed(buttons: number): boolean;
+    pressed(buttons: Uint8Array): boolean;
 }

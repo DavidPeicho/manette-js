@@ -21,7 +21,7 @@ export class Mapping {
 }
 
 export class BooleanMapping extends Mapping {
-    buttons: number = 0;
+    buttons = new Uint8Array(4);
 
     constructor(source: InputSource) {
         super(source);
@@ -29,8 +29,9 @@ export class BooleanMapping extends Mapping {
     }
 
     setButtons(...buttons: number[]): this {
-        this.buttons = 0;
-        for (const button of buttons) this.buttons |= button;
+        for (let i = 0; i < this.buttons.length; ++i) {
+            this.buttons[i] = i < buttons.length ? buttons[i] : 0;
+        }
         return this;
     }
 

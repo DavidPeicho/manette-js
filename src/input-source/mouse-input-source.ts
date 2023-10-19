@@ -1,12 +1,11 @@
 import {InputSource} from './input.js';
 
 export enum MouseButtonBinding {
-    None = 0,
-    Primary = 1 << 0,
-    Secondary = 1 << 1,
-    Auxiliary = 1 << 2,
-    Fourth = 1 << 3,
-    Fifth = 1 << 4,
+    Primary = 1,
+    Secondary = 2,
+    Auxiliary = 3,
+    Fourth = 4,
+    Fifth = 5,
 }
 
 export enum MouseValueBinding {
@@ -43,8 +42,13 @@ export class MouseInputSource implements InputSource {
         window.removeEventListener('pointermove', this.#onMouseMove);
     }
 
-    pressed(buttons: number): boolean {
-        return (buttons & this.buttons) === buttons;
+    pressed(buttons: Uint8Array): boolean {
+        let value = 0;
+        if (buttons[0] > 0) value |= buttons[0];
+        if (buttons[1] > 0) value |= buttons[1];
+        if (buttons[2] > 0) value |= buttons[2];
+        if (buttons[3] > 0) value |= buttons[3];
+        return (value & this.buttons) === value;
     }
 
     get mouseNDC(): Float32Array {

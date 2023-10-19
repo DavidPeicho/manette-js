@@ -22,7 +22,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "pretty": "prettier --config ./prettierrc.json --write \"src/**/*.ts\"",
+    "pretty": "prettier --config ./prettierrc.json --write \"src/**/*.ts\" \"example/**/*.ts\"",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
