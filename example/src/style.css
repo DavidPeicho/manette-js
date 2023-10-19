@@ -14,62 +14,80 @@
     -webkit-text-size-adjust: 100%;
 }
 
-  a {
+a {
     font-weight: 500;
     color: #646cff;
     text-decoration: inherit;
-  }
-  a:hover {
+}
+a:hover {
     color: #535bf2;
-  }
+}
 
-  body {
+body {
     margin: 0;
     display: flex;
     place-items: center;
     min-width: 320px;
     min-height: 100vh;
-  }
+    user-select: none;
+}
 
-  h1 {
+h1 {
     font-size: 3.2em;
     line-height: 1.1;
-  }
+}
 
-  #app {
+svg {
+    width: 64px;
+    height: 64px;
+}
+
+svg > path {
+    stroke: #cccccc;
+}
+
+#app {
     display: flex;
     max-width: 1280px;
     height: 400px;
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
-  }
+}
 
-  .column {
+.column {
     min-width: 400px;
     margin: 0px 4px 0px 4px;
     background-color: #1a1a1a;
     display: flex; /*added*/
     flex-direction: column; /*added*/
-  }
+}
 
-  .column > div {
+.column > div {
     overflow-y: auto;
     overflow-x: hidden;
-  }
+}
 
-  .logo {
+.icon-container {
+    padding: 12px 0 12px 0;
+}
+
+.glow {
+    filter: drop-shadow(0 0 1em red);
+}
+
+.logo {
     height: 6em;
     padding: 1.5em;
     will-change: filter;
     transition: filter 300ms;
-  }
-  .logo:hover {
+}
+.logo:hover {
     filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.vanilla:hover {
+}
+.logo.vanilla:hover {
     filter: drop-shadow(0 0 2em #3178c6aa);
-  }
+}
 
   .card {
     padding: 2em;

@@ -6,3 +6,7 @@
 * Long press
 
 js input & action mapping library for real-time experiences
+
+## Attributions
+
+* Thanks to Dazzle UI for the [SVG icons](https://www.svgrepo.com/svg/533083/keyboard) used in the example.
