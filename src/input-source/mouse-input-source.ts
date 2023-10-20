@@ -14,7 +14,7 @@ export enum MouseValueBinding {
     Position = 1 << 0,
 }
 
-export class MouseInputSource implements InputSource {
+export class MouseInputSource extends InputSource {
     #onMousePress = this._onMousePress.bind(this);
     #onMouseRelease = this._onMouseRelease.bind(this);
     #onMouseMove = this._onMouseMove.bind(this);

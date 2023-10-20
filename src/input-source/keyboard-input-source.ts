@@ -136,7 +136,7 @@ function toBit32(bit128: number) {
     return 1 << bit128 % 32;
 }
 
-export class KeyboardInputSource implements InputSource {
+export class KeyboardInputSource extends InputSource {
     static get TypeName() {
         return 'keyboard';
     }

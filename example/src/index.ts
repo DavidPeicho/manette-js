@@ -24,11 +24,13 @@ const ENEMY_RADIUS = 12;
 const ENEMY_RADIUS_SQUARE = ENEMY_RADIUS * ENEMY_RADIUS;
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-    <div class="column">
-        <h1>Completed</h1>
-        <div id="completed"></div>
+    <h1>Action Mapping Shooter</h1>
+    <div class="content">
+        <div id="completed" class="column background-color">
+            <div class="list-gradient"></div>
+        </div>
+        <canvas></canvas>
     </div>
-    <canvas></canvas>
 `;
 
 const completed = document.getElementById('completed')!;
@@ -43,8 +45,19 @@ function completedEvent(action: Action) {
     if (action.name != lastAction.actionId) {
         lastAction.actionId = action.name;
         lastAction.count = 0;
-        lastAction.element = document.createElement('p');
-        completed.appendChild(lastAction.element);
+
+        const svg = action.source?.id === 'mouse' ? mouseSVG : keyboardSVG;
+
+        const template = document.createElement('div');
+        template.innerHTML = `
+            <div class="action">
+                ${svg}
+                <p>Action</p>
+            </div>
+        `;
+
+        completed.prepend(template);
+        lastAction.element = template.getElementsByTagName('p')[0];
     }
 
     const {count, element} = lastAction;
@@ -52,15 +65,15 @@ function completedEvent(action: Action) {
     ++lastAction.count;
 }
 
-const mouseInput = new MouseInputSource();
+const mouseInput = new MouseInputSource('mouse');
 mouseInput.enable(document.body);
 
-const keyboardInput = new KeyboardInputSource();
+const keyboardInput = new KeyboardInputSource('keyboard');
 keyboardInput.enable(document.body);
 
 const manager = new ActionManager([mouseInput]);
 
-const fire = new BooleanAction('fire');
+const fire = new BooleanAction('Fire');
 fire.completed.add(completedEvent);
 
 const jump = new BooleanAction('jump');
@@ -77,9 +90,10 @@ manager.add(backward, [new BooleanMapping(keyboardInput).setButtons(KeyboardBind
 const canvas = document.getElementsByTagName('canvas')[0];
 canvas.width = window.devicePixelRatio * canvas.clientWidth;
 canvas.height = window.devicePixelRatio * canvas.clientHeight;
-const width = canvas.clientWidth;
-const height = canvas.clientHeight;
-const ctx = canvas.getContext('2d')!;
+let width = 0;
+let height = 0;
+resize();
+window.onresize = resize;
 
 const _vector = vec2.create();
 const position = vec2.set(vec2.create(), width * 0.5, height - PLAYER_HEIGHT);
@@ -87,7 +101,7 @@ const direction = vec2.set(vec2.create(), 0.0, 0.0);
 vec2.normalize(direction, direction);
 const speed = 1.0;
 
-const enemies = new Array<vec2>(10).fill(null!).map(() => {
+const enemies = new Array<vec2>(20).fill(null!).map(() => {
     return vec2.set(vec2.create(), Math.random() * width, Math.random() * height);
 });
 const bullets: {pos: vec2; dir: vec2}[] = [];
@@ -145,6 +159,7 @@ function update(dt: number) {
     }
 }
 
+const ctx = canvas.getContext('2d')!;
 function render() {
     /* Clear background */
     ctx.fillStyle = '#1a1a1a';
@@ -162,6 +177,13 @@ function render() {
     for (const bullet of bullets) {
         renderCircle(ctx, bullet.pos, 4, '#cccccc');
     }
+}
+
+function resize() {
+    width = canvas.clientWidth;
+    height = canvas.clientHeight;
+    canvas.width = width * window.devicePixelRatio;
+    canvas.height = height * window.devicePixelRatio;
 }
 
 let previousTime = performance.now();

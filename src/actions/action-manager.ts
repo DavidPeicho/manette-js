@@ -31,13 +31,16 @@ export class ActionManager {
             action.reset();
             for (const mapping of mappings) {
                 const match = mapping.update(action);
-                const state = mapping.trigger?.update(action);
-                switch (state) {
+                action.source = match ? mapping.source : null;
+                action.state = mapping.trigger?.update(action) ?? TriggerState.None;
+                switch (action.state) {
                     case TriggerState.Completed:
                         action.completed.notify(action);
                         break;
+                    default:
+                        break;
                 }
-                if (!match) break;
+                if (match) break;
             }
         }
     }
