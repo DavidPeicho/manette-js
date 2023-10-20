@@ -78,6 +78,10 @@ export class MouseInputSource implements InputSource {
         this.#onRelease.notify(e);
     }
 
+    get absolute() {
+        return this.#mouseAbsolute;
+    }
+
     get onPress() {
         return this.#onPress;
     }
