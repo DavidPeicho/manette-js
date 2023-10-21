@@ -46,7 +46,7 @@ svg > path {
     display: flex;
     flex-direction: column;
     max-width: 1280px;
-    height: 400px;
+    /* height: 400px; */
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
@@ -55,7 +55,13 @@ svg > path {
 .content {
     display: flex;
     width: 100%;
-    height: 100%;
+    max-height: 420px;
+}
+
+.content > canvas {
+    width: 720px;
+    height: 420px;
+    margin-left: 4px;
 }
 
 .column {
@@ -65,6 +71,7 @@ svg > path {
     padding: 24px;
     min-width: 400px;
     margin: 0px 4px 0px 4px;
+    overflow: hidden;
 }
 
 .column > .content {
@@ -94,22 +101,9 @@ svg > path {
     background-image: linear-gradient(#1a1a1a00, #1a1a1aFF);
 }
 
-.logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-}
-.logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vanilla:hover {
-    filter: drop-shadow(0 0 2em #3178c6aa);
-}
-
-  .read-the-docs {
+.quote {
     color: #888;
-  }
+}
 
 @media (prefers-color-scheme: light) {
 

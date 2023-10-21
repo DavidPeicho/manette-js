@@ -24,12 +24,16 @@ const ENEMY_RADIUS = 12;
 const ENEMY_RADIUS_SQUARE = ENEMY_RADIUS * ENEMY_RADIUS;
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-    <h1>Action Mapping Shooter</h1>
+    <h1>Action Mapping</h1>
+    <p class="quote">
+        Example demonstrating the action mapping for mouse & keyboard sources.</br>
+        Move with <b>WASD</b> and shoot with the <b>mouse left</b> button.
+    </p>
     <div class="content">
         <div id="completed" class="column background-color">
             <div class="list-gradient"></div>
         </div>
-        <canvas></canvas>
+        <canvas/>
     </div>
 `;
 
@@ -76,24 +80,17 @@ const manager = new ActionManager([mouseInput]);
 const fire = new BooleanAction('Fire');
 fire.completed.add(completedEvent);
 
-const jump = new BooleanAction('jump');
-jump.completed.add(completedEvent);
-
 const forward = new BooleanAction('forward');
 const backward = new BooleanAction('backward');
 
 manager.add(fire, [new BooleanMapping(mouseInput).setButtons(MouseButtonBinding.Primary)]);
-manager.add(jump, [new BooleanMapping(keyboardInput).setButtons(KeyboardBinding.Space)]);
 manager.add(forward, [new BooleanMapping(keyboardInput).setButtons(KeyboardBinding.KeyW)]);
 manager.add(backward, [new BooleanMapping(keyboardInput).setButtons(KeyboardBinding.KeyS)]);
 
 const canvas = document.getElementsByTagName('canvas')[0];
-canvas.width = window.devicePixelRatio * canvas.clientWidth;
-canvas.height = window.devicePixelRatio * canvas.clientHeight;
 let width = 0;
 let height = 0;
 resize();
-window.onresize = resize;
 
 const _vector = vec2.create();
 const position = vec2.set(vec2.create(), width * 0.5, height - PLAYER_HEIGHT);
@@ -196,3 +193,5 @@ function animate() {
     window.requestAnimationFrame(animate);
 }
 animate();
+
+window.onresize = resize;
