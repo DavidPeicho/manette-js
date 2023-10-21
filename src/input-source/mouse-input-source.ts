@@ -1,3 +1,4 @@
+import {Emitter} from '../utils/event.js';
 import {InputSource} from './input.js';
 
 export enum MouseButtonBinding {
@@ -13,7 +14,7 @@ export enum MouseValueBinding {
     Position = 1 << 0,
 }
 
-export class MouseInputSource implements InputSource {
+export class MouseInputSource extends InputSource {
     #onMousePress = this._onMousePress.bind(this);
     #onMouseRelease = this._onMouseRelease.bind(this);
     #onMouseMove = this._onMouseMove.bind(this);
@@ -22,8 +23,12 @@ export class MouseInputSource implements InputSource {
 
     #mouseAbsolute = new Float32Array(2);
     #mouseNDC = new Float32Array(2);
-
     #element: HTMLElement | Window = window;
+
+    /* Listeners */
+
+    #onPress = new Emitter<[PointerEvent]>();
+    #onRelease = new Emitter<[PointerEvent]>();
 
     enable(element: HTMLElement | Window) {
         this.#element = element as HTMLElement;
@@ -66,8 +71,22 @@ export class MouseInputSource implements InputSource {
     }
     private _onMousePress(e: PointerEvent) {
         this.buttons = e.buttons;
+        this.#onPress.notify(e);
     }
     private _onMouseRelease(e: PointerEvent) {
         this.buttons = e.buttons;
+        this.#onRelease.notify(e);
+    }
+
+    get absolute() {
+        return this.#mouseAbsolute;
+    }
+
+    get onPress() {
+        return this.#onPress;
+    }
+
+    get onRelease() {
+        return this.#onRelease;
     }
 }

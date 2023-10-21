@@ -1,11 +1,5 @@
+import {InputSource, TriggerState} from '../index.js';
 import {Emitter} from '../utils/event.js';
-
-export enum ActionState {
-    None = 0,
-    Started = 1,
-    Completed = 2,
-    Canceled = 3,
-}
 
 export class Action {
     private readonly _name: string;
@@ -14,7 +8,8 @@ export class Action {
     completed = new Emitter<[Action]>();
     canceled = new Emitter<[Action]>();
 
-    state = ActionState.None;
+    source: InputSource | null = null;
+    state = TriggerState.None;
 
     constructor(name: string) {
         this._name = name;
@@ -24,7 +19,10 @@ export class Action {
         return this._name;
     }
 
-    reset() {}
+    reset() {
+        this.source = null;
+        this.state = TriggerState.None;
+    }
 
     magnitudeSq() {
         return 0.0;

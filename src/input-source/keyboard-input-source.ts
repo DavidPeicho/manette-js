@@ -1,3 +1,4 @@
+import {Emitter} from '../utils/event.js';
 import {InputSource} from './input.js';
 
 export enum KeyboardBinding {
@@ -135,7 +136,7 @@ function toBit32(bit128: number) {
     return 1 << bit128 % 32;
 }
 
-export class KeyboardInputSource implements InputSource {
+export class KeyboardInputSource extends InputSource {
     static get TypeName() {
         return 'keyboard';
     }
@@ -145,15 +146,20 @@ export class KeyboardInputSource implements InputSource {
 
     #element: HTMLElement | Window = window;
 
+    #onPress = new Emitter<[KeyboardEvent]>();
+    #onRelease = new Emitter<[KeyboardEvent]>();
+
     #onKeyPress = (e: KeyboardEvent) => {
         const bit128 = convertKeyCode(e.code);
         const index = toBitSetIndex(bit128);
         this.bitset[index] |= toBit32(bit128);
+        this.#onPress.notify(e);
     };
     #onKeyRelease = (e: KeyboardEvent) => {
         const bit128 = convertKeyCode(e.code);
         const index = toBitSetIndex(bit128);
         this.bitset[index] &= ~toBit32(bit128);
+        this.#onRelease.notify(e);
     };
 
     enable(element: HTMLElement | Window = window) {
@@ -177,5 +183,13 @@ export class KeyboardInputSource implements InputSource {
             if (!(this.bitset[index] & toBit32(buttons[i]))) return false;
         }
         return true;
+    }
+
+    get onPress() {
+        return this.#onPress;
+    }
+
+    get onRelease() {
+        return this.#onRelease;
     }
 }
