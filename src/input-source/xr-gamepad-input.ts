@@ -1,11 +1,13 @@
+import {InputSource, testButtons} from './input.js';
+
 export enum Handedness {
     Left = 0,
     Right = 1,
 }
 
 export enum XRButtonBinding {
-    Trigger = 0,
-    Grip = 1,
+    Trigger = 1,
+    Grip = 2,
     Joystick = 3,
     PrimaryButton = 4,
     SecondaryButton = 5,
@@ -14,14 +16,18 @@ export enum XRButtonBinding {
 /**
  * gamepad
  */
-export class XRGamepadInput {
+export class XRGamepadInput extends InputSource {
     /** @hidden */
     #xrInputSource: XRInputSource | null = null;
 
     private _handedness: Handedness;
     private _handednessStr: 'left' | 'right' = 'left';
 
-    constructor(handedness: Handedness) {
+    #pressed = 0;
+    #touched = 0;
+
+    constructor(id: string, handedness: Handedness) {
+        super(id);
         this._handedness = handedness;
         this._handednessStr = handedness === Handedness.Left ? 'left' : 'right';
     }
@@ -43,6 +49,20 @@ export class XRGamepadInput {
     update(): void {
         const gamepad = this.#xrInputSource?.gamepad;
         if (!gamepad) return;
+
+        const buttons = gamepad.buttons;
+
+        this.#pressed = 0;
+        this.#touched = 0;
+        for (let i = 0; i < buttons.length; ++i) {
+            const button = buttons[i];
+            this.#pressed &= button.pressed ? 1 << (i + 1) : ~0;
+            this.#touched &= button.touched ? 1 << (i + 1) : ~0;
+        }
+    }
+
+    pressed(buttons: Uint8Array): boolean {
+        return testButtons(buttons, this.#pressed);
     }
 
     enable(session: XRSession) {
@@ -51,5 +71,9 @@ export class XRGamepadInput {
 
     get handedness(): Handedness {
         return this._handedness;
+    }
+
+    get xrSource(): XRInputSource | null {
+        return this.#xrInputSource;
     }
 }
