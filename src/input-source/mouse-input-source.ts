@@ -1,5 +1,5 @@
 import {Emitter} from '../utils/event.js';
-import {InputSource} from './input.js';
+import {InputSource, testButtons} from './input.js';
 
 export enum MouseButtonBinding {
     Primary = 1,
@@ -48,12 +48,7 @@ export class MouseInputSource extends InputSource {
     }
 
     pressed(buttons: Uint8Array): boolean {
-        let value = 0;
-        if (buttons[0] > 0) value |= buttons[0];
-        if (buttons[1] > 0) value |= buttons[1];
-        if (buttons[2] > 0) value |= buttons[2];
-        if (buttons[3] > 0) value |= buttons[3];
-        return (value & this.buttons) === value;
+        return testButtons(buttons, this.buttons);
     }
 
     get mouseNDC(): Float32Array {
