@@ -47,7 +47,7 @@ export class MouseInputSource extends InputSource {
         window.removeEventListener('pointermove', this.#onMouseMove);
     }
 
-    pressed(buttons: Uint8Array): boolean {
+    groupPressed(buttons: Uint8Array): boolean {
         return testButtons(buttons, this.buttons);
     }
 

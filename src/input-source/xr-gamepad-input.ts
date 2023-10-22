@@ -1,4 +1,4 @@
-import {InputSource, testButtons} from './input.js';
+import {InputSource, isAxisNonZero, testButtons} from './input.js';
 
 export enum Handedness {
     Left = 0,
@@ -11,6 +11,11 @@ export enum XRButtonBinding {
     Joystick = 3,
     PrimaryButton = 4,
     SecondaryButton = 5,
+}
+
+export enum XRAxisBinding {
+    Touchpad = 0,
+    Joystick = 1,
 }
 
 /**
@@ -61,8 +66,19 @@ export class XRGamepadInput extends InputSource {
         }
     }
 
-    pressed(buttons: Uint8Array): boolean {
+    groupPressed(buttons: Uint8Array): boolean {
         return testButtons(buttons, this.#pressed);
+    }
+
+    axis2d(out: Float32Array, button: XRAxisBinding): boolean {
+        const gamepad = this.#xrInputSource?.gamepad;
+        if (!gamepad) return false;
+
+        const i = button * 2;
+        out[0] = gamepad.axes[i];
+        out[1] = gamepad.axes[i + 1];
+
+        return isAxisNonZero(out);
     }
 
     enable(session: XRSession) {

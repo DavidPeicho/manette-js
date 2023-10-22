@@ -1,3 +1,5 @@
+import {EPSILON} from '../constants.js';
+
 export class InputSource {
     #id: string;
 
@@ -5,7 +7,24 @@ export class InputSource {
         this.#id = id;
     }
 
-    pressed(buttons: Uint8Array): boolean {
+    groupPressed(buttons: Uint8Array): boolean {
+        /* @todo: Unroll */
+        for (let i = 0; i < buttons.length; ++i) {
+            if (!buttons[i]) continue;
+            if (this.pressed(buttons[i])) return false;
+        }
+        return true;
+    }
+
+    value(button: number): number {
+        return this.pressed(button) ? 1.0 : 0.0;
+    }
+
+    pressed(button: number): boolean {
+        return false;
+    }
+
+    axis2d(out: Float32Array, button: number): boolean {
         return false;
     }
 
@@ -21,4 +40,8 @@ export function testButtons(buttons: Uint8Array, bitset: number): boolean {
     if (buttons[2] > 0) value |= buttons[2];
     if (buttons[3] > 0) value |= buttons[3];
     return (value & bitset) === value;
+}
+
+export function isAxisNonZero(axis: ArrayLike<number>): boolean {
+    return Math.abs(axis[0]) > EPSILON || Math.abs(axis[1]) > EPSILON;
 }
