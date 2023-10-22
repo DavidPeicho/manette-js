@@ -175,14 +175,9 @@ export class KeyboardInputSource extends InputSource {
         this.#element = window;
     }
 
-    pressed(buttons: Uint8Array): boolean {
-        /* @todo: Unroll */
-        for (let i = 0; i < buttons.length; ++i) {
-            if (!buttons[i]) continue;
-            const index = toBitSetIndex(buttons[i]);
-            if (!(this.bitset[index] & toBit32(buttons[i]))) return false;
-        }
-        return true;
+    pressed(button: number): boolean {
+        const index = toBitSetIndex(button);
+        return !!(this.bitset[index] & toBit32(button));
     }
 
     get onPress() {

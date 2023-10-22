@@ -8,8 +8,11 @@ import mouseSVG from '/mouse.svg?raw';
 import {
     Action,
     ActionManager,
+    Axis2dAction,
     BooleanAction,
     BooleanMapping,
+    DownTrigger,
+    EmulatedAxis2dMapping,
     KeyboardBinding,
     KeyboardInputSource,
     MouseButtonBinding,
@@ -80,12 +83,20 @@ const manager = new ActionManager([mouseInput]);
 const fire = new BooleanAction('Fire');
 fire.completed.add(completedEvent);
 
-const forward = new BooleanAction('forward');
-const backward = new BooleanAction('backward');
+const move = new Axis2dAction('Move');
+move.completed.add(completedEvent);
 
 manager.add(fire, [new BooleanMapping(mouseInput).setButtons(MouseButtonBinding.Primary)]);
-manager.add(forward, [new BooleanMapping(keyboardInput).setButtons(KeyboardBinding.KeyW)]);
-manager.add(backward, [new BooleanMapping(keyboardInput).setButtons(KeyboardBinding.KeyS)]);
+manager.add(move, [
+    new EmulatedAxis2dMapping(keyboardInput)
+        .setButtons({
+            maxY: KeyboardBinding.KeyW,
+            minX: KeyboardBinding.KeyA,
+            minY: KeyboardBinding.KeyS,
+            maxX: KeyboardBinding.KeyD,
+        })
+        .setTrigger(new DownTrigger()),
+]);
 
 const canvas = document.getElementsByTagName('canvas')[0];
 let width = 0;
@@ -121,7 +132,7 @@ function update(dt: number) {
     vec2.sub(direction, mouseInput.absolute, pagePosition);
     vec2.normalize(direction, direction);
 
-    const s = forward.value ? speed : backward.value ? -speed : 0;
+    const s = move.value[1] * speed;
     const translate = vec2.scaleAndAdd(vec2.zero(_vector), _vector, direction, s);
     vec2.add(position, position, translate);
 
@@ -158,19 +169,19 @@ function update(dt: number) {
 
 const ctx = canvas.getContext('2d')!;
 function render() {
-    /* Clear background */
+    /* Render background */
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    /* Draw player */
+    /* Render player */
     renderTriangle(ctx, position, direction, PLAYER_HEIGHT);
 
-    /* Draw ennemies */
+    /* Render ennemies */
     for (const enemy of enemies) {
         renderCircle(ctx, enemy, ENEMY_RADIUS, '#2ecc71', '#27ae60');
     }
 
-    /* Draw bullets */
+    /* Render bullets */
     for (const bullet of bullets) {
         renderCircle(ctx, bullet.pos, 4, '#cccccc');
     }
