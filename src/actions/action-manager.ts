@@ -4,24 +4,51 @@ import {TriggerState} from '../trigger.js';
 import {Action} from './actions.js';
 
 export class ActionManager {
-    _sourceToIndex: Map<InputSource, number> = new Map();
-    _sources: InputSource[];
+    validate = true;
 
-    _actions: Action[] = [];
-    _mappings: Mapping[][] = [];
+    readonly _sources: InputSource[];
+    readonly _actions: Action[] = [];
+    readonly _mappings: Mapping[][] = [];
 
     constructor(sources: InputSource[]) {
         this._sources = new Array(sources.length).fill(null);
         for (let i = 0; i < sources.length; ++i) {
             this._sources[i] = sources[i];
-            this._sourceToIndex.set(sources[i], i);
         }
     }
 
-    add(action: Action, mappings: Mapping[] = []): this {
+    add(action: Action, mappings: Mapping[]): this {
+        if (this.validate) {
+            if (this.actionId(action) === null) {
+                throw new Error(`action ${action.name} already added. Update the mapping`);
+            }
+            for (const mapping of mappings) {
+                mapping.validate(action);
+            }
+        }
+
+        const actionId = this._actions.length;
         this._actions.push(action);
-        this._mappings.push([...mappings]);
+        this._mappings.push([]);
+        return this.setMapping(actionId, mappings);
+    }
+
+    setMapping(actionId: number, mappings: Mapping[]): this {
+        const action = this._actions[actionId];
+        if (this.validate) {
+            if (!action) {
+                throw new Error(`action with id '${actionId}' doesn't exist`);
+            }
+            for (const mapping of mappings) {
+                mapping.validate(action);
+            }
+        }
+        this._mappings[actionId] = [...mappings];
         return this;
+    }
+
+    mapping(actionId: number): Mapping[] {
+        return this._mappings[actionId];
     }
 
     update(dt: number) {
