@@ -18,15 +18,9 @@ export class ActionManager {
     }
 
     add(action: Action, mappings: Mapping[]): this {
-        if (this.validate) {
-            if (this.actionId(action) === null) {
-                throw new Error(`action ${action.name} already added. Update the mapping`);
-            }
-            for (const mapping of mappings) {
-                mapping.validate(action);
-            }
+        if (this.validate && this.actionId(action) !== null) {
+            throw new Error(`action ${action.name} already added. Update the mapping`);
         }
-
         const actionId = this._actions.length;
         this._actions.push(action);
         this._mappings.push([]);

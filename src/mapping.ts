@@ -21,6 +21,12 @@ export class Mapping {
     }
 
     validate(action: Action): void {}
+
+    protected _validateSourceButtons(...buttons: number[]) {
+        for (const button of buttons) {
+            this.source.validateButton(button);
+        }
+    }
 }
 
 export class BooleanMapping extends Mapping {
@@ -47,12 +53,13 @@ export class BooleanMapping extends Mapping {
     validate(action: Action): void {
         const value = (action as BooleanAction).value;
         const type = typeof value;
-        if (type === 'boolean' || type === 'number') return;
-
-        throw new Error(
-            'BooleanMapping can only be used with boolean / numeric actions.\n' +
-                `\tAction '${action.name}' has a non-compatible value of type ${type}.`
-        );
+        if (type !== 'boolean' && type !== 'number') {
+            throw new Error(
+                'BooleanMapping can only be used with boolean / numeric actions.\n' +
+                    `\tAction '${action.name}' has a non-compatible value of type ${type}.`
+            );
+        }
+        this._validateSourceButtons(...this.buttons);
     }
 }
 
@@ -70,12 +77,13 @@ export class Axis2dMapping extends Mapping {
 
     validate(action: Action): void {
         const value = (action as Axis2dAction).value;
-        if (Array.isArray(value)) return;
-
-        throw new Error(
-            'Axis2dMapping can only be used with axis2d actions.\n' +
-                `\tAction '${action.name}' has a non-array value.`
-        );
+        if (!Array.isArray(value)) {
+            throw new Error(
+                'Axis2dMapping can only be used with axis2d actions.\n' +
+                    `\tAction '${action.name}' has a non-array value.`
+            );
+        }
+        this.source.validateAxis(this.button);
     }
 }
 
@@ -111,5 +119,17 @@ export class EmulatedAxis2dMapping extends Mapping {
         this.buttons[2] = buttons.minY;
         this.buttons[3] = buttons.maxY;
         return this;
+    }
+
+    validate(action: Action): void {
+        const value = (action as Axis2dAction).value;
+        const type = typeof value;
+        if (type !== 'object') {
+            throw new Error(
+                `Action '${action.name}' has a non-array value, found type '${type}'.\n` +
+                    '\tEmulatedAxis2dMapping can only be used with axis2d actions.'
+            );
+        }
+        this._validateSourceButtons(...this.buttons);
     }
 }

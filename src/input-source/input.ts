@@ -28,6 +28,9 @@ export class InputSource {
         return false;
     }
 
+    validateButton(button: number) {}
+    validateAxis(button: number) {}
+
     get id() {
         return this.#id;
     }
