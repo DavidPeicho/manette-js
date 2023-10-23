@@ -78,24 +78,28 @@ mouseInput.enable(document.body);
 const keyboardInput = new KeyboardInputSource('keyboard');
 keyboardInput.enable(document.body);
 
-const manager = new ActionManager([mouseInput]);
-
 const fire = new BooleanAction('Fire');
 fire.completed.add(completedEvent);
+fire.completed.add(() => {
+    /* Listen for the fire action to trigger. */
+    bullets.push({
+        pos: vec2.copy(vec2.create(), position),
+        dir: vec2.copy(vec2.create(), direction),
+    });
+});
 
 const move = new Axis2dAction('Move');
 move.completed.add(completedEvent);
 
-manager.add(fire, [new BooleanMapping(mouseInput).setButtons(MouseButtonBinding.Primary)]);
+const manager = new ActionManager([mouseInput, keyboardInput]);
+manager.add(fire, [new BooleanMapping(mouseInput, MouseButtonBinding.Primary)]);
 manager.add(move, [
-    new EmulatedAxis2dMapping(keyboardInput)
-        .setButtons({
-            maxY: KeyboardBinding.KeyW,
-            minX: KeyboardBinding.KeyA,
-            minY: KeyboardBinding.KeyS,
-            maxX: KeyboardBinding.KeyD,
-        })
-        .setTrigger(new DownTrigger()),
+    new EmulatedAxis2dMapping(keyboardInput, {
+        maxY: KeyboardBinding.KeyW,
+        minX: KeyboardBinding.KeyA,
+        minY: KeyboardBinding.KeyS,
+        maxX: KeyboardBinding.KeyD,
+    }).setTrigger(new DownTrigger()),
 ]);
 
 const canvas = document.getElementsByTagName('canvas')[0];
@@ -113,14 +117,6 @@ const enemies = new Array<vec2>(20).fill(null!).map(() => {
     return vec2.set(vec2.create(), Math.random() * width, Math.random() * height);
 });
 const bullets: {pos: vec2; dir: vec2}[] = [];
-
-fire.completed.add(() => {
-    /* Listen for the fire action to trigger. */
-    bullets.push({
-        pos: vec2.copy(vec2.create(), position),
-        dir: vec2.copy(vec2.create(), direction),
-    });
-});
 
 function update(dt: number) {
     manager.update(dt);

@@ -137,10 +137,6 @@ function toBit32(bit128: number) {
 }
 
 export class KeyboardInputSource extends InputSource {
-    static get TypeName() {
-        return 'keyboard';
-    }
-
     /** No more than 4 * 32 keys. */
     bitset: Int32Array = new Int32Array(4);
 
@@ -178,6 +174,15 @@ export class KeyboardInputSource extends InputSource {
     pressed(button: number): boolean {
         const index = toBitSetIndex(button);
         return !!(this.bitset[index] & toBit32(button));
+    }
+
+    validateButton(button: number) {
+        if (KeyboardBinding[button] === undefined) {
+            throw new Error(
+                `Input source '${this.id}' used with an invalid button.\n` +
+                    `\tButton '${button}' doesn't exist on KeyboardBinding'`
+            );
+        }
     }
 
     get onPress() {
