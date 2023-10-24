@@ -1,7 +1,4 @@
 import './style.css';
-
-import {vec2} from 'gl-matrix';
-
 import keyboardSVG from '/keyboard.svg?raw';
 import mouseSVG from '/mouse.svg?raw';
 
@@ -18,27 +15,12 @@ import {
     MouseButtonBinding,
     MouseInputSource,
 } from 'haptic-js';
-import {renderCircle, renderTriangle} from './render';
 
-/* Constants */
-const PLAYER_HEIGHT = 60;
-const BULLET_SPEED = 0.75;
-const ENEMY_RADIUS = 12;
-const ENEMY_RADIUS_SQUARE = ENEMY_RADIUS * ENEMY_RADIUS;
+import {Game} from './game.js';
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-    <h1>Action Mapping</h1>
-    <p class="quote">
-        Example demonstrating the action mapping for mouse & keyboard sources.</br>
-        Move with <b>WASD</b> and shoot with the <b>mouse left</b> button.
-    </p>
-    <div class="content">
-        <div id="completed" class="column background-color">
-            <div class="list-gradient"></div>
-        </div>
-        <canvas/>
-    </div>
-`;
+// Contains the game logic: Move player, update bullets & enemies.
+const game = new Game(document.getElementsByTagName('canvas')[0]);
+window.onresize = () => game.resize();
 
 const completed = document.getElementById('completed')!;
 
@@ -72,133 +54,80 @@ function completedEvent(action: Action) {
     ++lastAction.count;
 }
 
+/*
+ * This example contains two sources:
+ *
+ * - MouseInputSource
+ * - KeyboardInputSource
+ *
+ * Sources process raw inputs from device such as mouse, keyboard,
+ * gamepads.
+ */
+
 const mouseInput = new MouseInputSource('mouse');
 mouseInput.enable(document.body);
 
 const keyboardInput = new KeyboardInputSource('keyboard');
 keyboardInput.enable(document.body);
 
-const fire = new BooleanAction('Fire');
-fire.completed.add(completedEvent);
-fire.completed.add(() => {
-    /* Listen for the fire action to trigger. */
-    bullets.push({
-        pos: vec2.copy(vec2.create(), position),
-        dir: vec2.copy(vec2.create(), direction),
-    });
-});
+/*
+ * Action definition.
+ *
+ * Every action is used to perform logic in the game, such as
+ * moving the player, or firing a bullet.
+ */
 
+// Triggered when the player moves.
 const move = new Axis2dAction('Move');
-move.completed.add(completedEvent);
+// Triggered when the player shoots.
+const fire = new BooleanAction('Fire');
+fire.completed.add(() => game.spawnBullet()); // Fire bullet upon event.
+
+// Whenever any of the action triggers, update the UI.
+for (const action of [fire, move]) {
+    action.completed.add(completedEvent);
+}
+
+/*
+ * The ActionManager is in charge of linking actions to their mapping.
+ *
+ * The manager must be updated by calling `manager.update(dt)` every
+ * frame in order to notify the attached triggers.
+ */
 
 const manager = new ActionManager([mouseInput, keyboardInput]);
-manager.add(fire, [new BooleanMapping(mouseInput, MouseButtonBinding.Primary)]);
+manager.add(fire, [
+    new BooleanMapping(mouseInput, MouseButtonBinding.Primary),
+    new BooleanMapping(keyboardInput, KeyboardBinding.Enter),
+]);
 manager.add(move, [
     new EmulatedAxis2dMapping(keyboardInput, {
+        // WASD to [-1; 1]
         maxY: KeyboardBinding.KeyW,
         minX: KeyboardBinding.KeyA,
         minY: KeyboardBinding.KeyS,
         maxX: KeyboardBinding.KeyD,
     }).setTrigger(new DownTrigger()),
+    new EmulatedAxis2dMapping(keyboardInput, {
+        // Arrows to [-1; 1]
+        maxY: KeyboardBinding.ArrowUp,
+        minX: KeyboardBinding.ArrowLeft,
+        minY: KeyboardBinding.ArrowDown,
+        maxX: KeyboardBinding.ArrowRight,
+    }).setTrigger(new DownTrigger()),
 ]);
 
-const canvas = document.getElementsByTagName('canvas')[0];
-let width = 0;
-let height = 0;
-resize();
-
-const _vector = vec2.create();
-const position = vec2.set(vec2.create(), width * 0.5, height - PLAYER_HEIGHT);
-const direction = vec2.set(vec2.create(), 0.0, 0.0);
-vec2.normalize(direction, direction);
-const speed = 1.0;
-
-const enemies = new Array<vec2>(20).fill(null!).map(() => {
-    return vec2.set(vec2.create(), Math.random() * width, Math.random() * height);
-});
-const bullets: {pos: vec2; dir: vec2}[] = [];
-
-function update(dt: number) {
-    manager.update(dt);
-
-    const pagePosition = vec2.create();
-    vec2.set(pagePosition, canvas.offsetLeft, canvas.offsetTop);
-    vec2.add(pagePosition, pagePosition, position);
-
-    vec2.sub(direction, mouseInput.absolute, pagePosition);
-    vec2.normalize(direction, direction);
-
-    const s = move.value[1] * speed;
-    const translate = vec2.scaleAndAdd(vec2.zero(_vector), _vector, direction, s);
-    vec2.add(position, position, translate);
-
-    /* Update bullets */
-    for (let i = bullets.length - 1; i >= 0; --i) {
-        const bullet = bullets[i];
-
-        const dir = vec2.scale(_vector, bullet.dir, BULLET_SPEED * dt);
-        vec2.add(bullet.pos, bullet.pos, dir);
-
-        /* Enemy killed */
-        let terminated = false;
-        for (let enemyId = enemies.length - 1; enemyId >= 0; --enemyId) {
-            if (vec2.sqrDist(enemies[enemyId], bullet.pos) > ENEMY_RADIUS_SQUARE) {
-                continue;
-            }
-            enemies.splice(enemyId, 1);
-            terminated = true;
-            break;
-        }
-
-        if (
-            terminated ||
-            /* Out of bounds */
-            bullet.pos[0] < 0.0 ||
-            bullet.pos[0] > width ||
-            bullet.pos[1] < 0.0 ||
-            bullet.pos[1] > height
-        ) {
-            bullets.splice(i, 1);
-        }
-    }
-}
-
-const ctx = canvas.getContext('2d')!;
-function render() {
-    /* Render background */
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    /* Render player */
-    renderTriangle(ctx, position, direction, PLAYER_HEIGHT);
-
-    /* Render ennemies */
-    for (const enemy of enemies) {
-        renderCircle(ctx, enemy, ENEMY_RADIUS, '#2ecc71', '#27ae60');
-    }
-
-    /* Render bullets */
-    for (const bullet of bullets) {
-        renderCircle(ctx, bullet.pos, 4, '#cccccc');
-    }
-}
-
-function resize() {
-    width = canvas.clientWidth;
-    height = canvas.clientHeight;
-    canvas.width = width * window.devicePixelRatio;
-    canvas.height = height * window.devicePixelRatio;
-}
-
-let previousTime = performance.now();
 function animate() {
     const now = performance.now();
-    update(now - previousTime);
-    render();
+    const dt = (now - game.previousTime) / 1000.0;
 
-    previousTime = now;
+    manager.update(dt);
+
+    game.moveSpeed = move.value[1];
+    game.update(dt, mouseInput.absolute);
+    game.render();
+
+    game.previousTime = now;
     window.requestAnimationFrame(animate);
 }
 animate();
-
-window.onresize = resize;

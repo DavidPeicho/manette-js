@@ -24,6 +24,7 @@ export class Mapping {
 
     protected _validateSourceButtons(...buttons: number[]) {
         for (const button of buttons) {
+            if (!button) continue;
             this.source.validateButton(button);
         }
     }
