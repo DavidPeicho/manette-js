@@ -11,7 +11,7 @@ export class InputSource {
         /* @todo: Unroll */
         for (let i = 0; i < buttons.length; ++i) {
             if (!buttons[i]) continue;
-            if (this.pressed(buttons[i])) return false;
+            if (!this.pressed(buttons[i])) return false;
         }
         return true;
     }

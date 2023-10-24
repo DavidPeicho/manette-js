@@ -18,41 +18,33 @@ import {
 
 import {Game} from './game.js';
 
-// Contains the game logic: Move player, update bullets & enemies.
+const ui = document.getElementById('ui')!;
+
+/**
+ * Append an action in the UI.
+ *
+ * @param action The action to append.
+ */
+function updateUI(action: Action) {
+    let last = (ui.children[0] as HTMLElement).querySelector('p[action-id]');
+    if (!last || last.getAttribute('action-id') !== action.name) {
+        const div = document.createElement('div');
+        div.classList.add('action');
+        div.innerHTML = `
+            ${action.source!.id === 'keyboard' ? keyboardSVG : mouseSVG}
+            <p action-id=${action.name} count="0">Action</p>
+        `;
+        last = div.children[1];
+        ui.prepend(div);
+    }
+    const count = `${parseInt(last.getAttribute('count')!) + 1}`;
+    last.setAttribute('count', count);
+    last.innerHTML = `${action.name} x${count}`;
+}
+
+// Contains the game logic, i.e., player, bullets & enemy logic.
 const game = new Game(document.getElementsByTagName('canvas')[0]);
 window.onresize = () => game.resize();
-
-const completed = document.getElementById('completed')!;
-
-const lastAction = {
-    actionId: '',
-    element: null as HTMLElement | null,
-    count: 0,
-};
-
-function completedEvent(action: Action) {
-    if (action.name != lastAction.actionId) {
-        lastAction.actionId = action.name;
-        lastAction.count = 0;
-
-        const svg = action.source?.id === 'mouse' ? mouseSVG : keyboardSVG;
-
-        const template = document.createElement('div');
-        template.innerHTML = `
-            <div class="action">
-                ${svg}
-                <p>Action</p>
-            </div>
-        `;
-
-        completed.prepend(template);
-        lastAction.element = template.getElementsByTagName('p')[0];
-    }
-
-    const {count, element} = lastAction;
-    element!.innerHTML = count > 0 ? `${action.name} x${count}` : action.name;
-    ++lastAction.count;
-}
 
 /*
  * This example contains two sources:
@@ -85,7 +77,7 @@ fire.completed.add(() => game.spawnBullet()); // Fire bullet upon event.
 
 // Whenever any of the action triggers, update the UI.
 for (const action of [fire, move]) {
-    action.completed.add(completedEvent);
+    action.completed.add(updateUI);
 }
 
 /*

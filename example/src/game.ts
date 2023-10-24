@@ -8,8 +8,12 @@ const BULLET_SPEED = 750.0;
 const ENEMY_RADIUS = 12;
 const ENEMY_RADIUS_SQUARE = ENEMY_RADIUS * ENEMY_RADIUS;
 
-/* Game Logic */
-
+/**
+ * Game instance.
+ *
+ * The entire game logic is added in this class to make
+ * the example's action mapping setup easy to follow.
+ */
 export class Game {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
@@ -91,11 +95,12 @@ export class Game {
         }
     }
 
+    /** Render the player, enemies, and bullets to the canvas. */
     render() {
-        this.ctx.fillStyle = '#1a1a1a'; /* Background */
+        this.ctx.fillStyle = '#1a1a1a'; // Background
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this._renderTriangle(this.position, this.direction, PLAYER_HEIGHT); /* Player */
+        this._renderTriangle(this.position, this.direction, PLAYER_HEIGHT);
 
         for (const enemy of this.enemies) {
             this._renderCircle(enemy, ENEMY_RADIUS, '#2ecc71', '#27ae60');
@@ -105,6 +110,7 @@ export class Game {
         }
     }
 
+    /** Spawn a new bullet at the player position. */
     spawnBullet() {
         this.bullets.push({
             pos: vec2.copy(vec2.create(), this.position),
@@ -112,6 +118,7 @@ export class Game {
         });
     }
 
+    /** Resize the canvas */
     resize() {
         this.width = this.canvas.clientWidth;
         this.height = this.canvas.clientHeight;
@@ -119,6 +126,14 @@ export class Game {
         this.canvas.height = this.height * window.devicePixelRatio;
     }
 
+    /**
+     * Render a circle.
+     *
+     * @param pos Center position of the circle.
+     * @param radius The radius of the circle, in **css pixels**.
+     * @param fillStyle The fill style.
+     * @param strokeStyle The stroke style.
+     */
     private _renderCircle(
         pos: vec2,
         radius = 1,
@@ -147,6 +162,13 @@ export class Game {
         ctx.restore();
     }
 
+    /**
+     * Render a triangle.
+     *
+     * @param pos Center of the triangle.
+     * @param dir Direction to orient the triangle toward.
+     * @param heightCSS The height of the isolceles triangle, in **css pixels**.
+     */
     private _renderTriangle(pos: vec2, dir: vec2, heightCSS: number) {
         const ctx = this.ctx;
         const len = 20 * window.devicePixelRatio;
