@@ -12,6 +12,7 @@ import {
     EmulatedAxis2dMapping,
     KeyboardBinding,
     KeyboardInputSource,
+    LongPressTrigger,
     MouseButtonBinding,
     MouseInputSource,
 } from 'haptic-js';
@@ -74,6 +75,9 @@ const move = new Axis2dAction('Move');
 // Triggered when the player shoots.
 const fire = new BooleanAction('Fire');
 fire.completed.add(() => game.spawnBullet()); // Fire bullet upon event.
+// Triggered when the player shoots.
+const reset = new BooleanAction('ResetGame');
+reset.completed.add(() => console.log('DKLALDLQDLDLDLD'));
 
 // Whenever any of the action triggers, update the UI.
 for (const action of [fire, move]) {
@@ -107,6 +111,9 @@ manager.add(move, [
         minY: KeyboardBinding.ArrowDown,
         maxX: KeyboardBinding.ArrowRight,
     }).setTrigger(new DownTrigger()),
+]);
+manager.add(reset, [
+    new BooleanMapping(keyboardInput).setTrigger(new LongPressTrigger(2.0)),
 ]);
 
 function animate() {

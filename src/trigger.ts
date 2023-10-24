@@ -9,7 +9,7 @@ export enum TriggerState {
 }
 
 export interface Trigger {
-    update(action: Action): TriggerState;
+    update(action: Action, dt: number): TriggerState;
 }
 
 export class PressTrigger implements Trigger {
@@ -35,5 +35,32 @@ export class DownTrigger implements Trigger {
     update(action: Action) {
         const value = action.magnitudeSq();
         return value >= this.actuationSq ? TriggerState.Completed : TriggerState.None;
+    }
+}
+
+export class LongPressTrigger implements Trigger {
+    duration: number;
+    actuationSq = 0.5;
+
+    private _timer: number | null = null;
+
+    constructor(duration: number = 1.0) {
+        this.duration = duration;
+    }
+
+    update(action: Action, dt: number) {
+        const value = action.magnitudeSq();
+        const accuated = value >= this.actuationSq;
+        if (!accuated) {
+            return this._timer !== null ? TriggerState.Canceled : TriggerState.None;
+        }
+
+        if (this._timer === null) {
+            this._timer = this.duration;
+            return TriggerState.Started;
+        }
+
+        this._timer -= dt;
+        return this._timer > 0.0 ? TriggerState.Ongoing : TriggerState.Completed;
     }
 }

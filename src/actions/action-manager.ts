@@ -53,8 +53,17 @@ export class ActionManager {
             for (const mapping of mappings) {
                 const match = mapping.update(action);
                 action.source = match ? mapping.source : null;
-                action.state = mapping.trigger?.update(action) ?? TriggerState.None;
+                action.state = mapping.trigger?.update(action, dt) ?? TriggerState.None;
                 switch (action.state) {
+                    case TriggerState.Started:
+                        action.started.notify(action);
+                        break;
+                    case TriggerState.Ongoing:
+                        action.ongoing.notify(action);
+                        break;
+                    case TriggerState.Canceled:
+                        action.canceled.notify(action);
+                        break;
                     case TriggerState.Completed:
                         action.completed.notify(action);
                         break;

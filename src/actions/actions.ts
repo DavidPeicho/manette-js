@@ -5,6 +5,7 @@ export class Action {
     private readonly _name: string;
 
     started = new Emitter<[Action]>();
+    ongoing = new Emitter<[Action]>();
     completed = new Emitter<[Action]>();
     canceled = new Emitter<[Action]>();
 

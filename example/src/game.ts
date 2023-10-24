@@ -39,16 +39,7 @@ export class Game {
         this.ctx = this.canvas.getContext('2d')!;
 
         this.resize();
-
-        // Player position defaults to the center of the canvas.
-        vec2.set(this.position, this.width * 0.5, this.height - PLAYER_HEIGHT);
-
-        // Initialize enemies at random points.
-        for (let i = 0; i < 20; ++i) {
-            const x = Math.random() * this.width;
-            const y = Math.random() * this.height;
-            this.enemies.push(vec2.set(vec2.create(), x, y));
-        }
+        this.reset();
     }
 
     update(dt: number, mousePos: vec2) {
@@ -118,6 +109,18 @@ export class Game {
         this.height = this.canvas.clientHeight;
         this.canvas.width = this.width * window.devicePixelRatio;
         this.canvas.height = this.height * window.devicePixelRatio;
+    }
+
+    reset() {
+        // Initialize enemies at random points.
+        this.enemies.length = 0;
+        for (let i = 0; i < 20; ++i) {
+            const x = Math.random() * this.width;
+            const y = Math.random() * this.height;
+            this.enemies.push(vec2.set(vec2.create(), x, y));
+        }
+        // Player position defaults to the center of the canvas.
+        vec2.set(this.position, this.width * 0.5, this.height - PLAYER_HEIGHT);
     }
 
     /**
