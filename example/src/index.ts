@@ -113,8 +113,14 @@ function animate() {
     const now = performance.now();
     const dt = (now - game.previousTime) / 1000.0;
 
+    // The manager needs to be updated with the delta time due to some
+    // triggers being time-based.
     manager.update(dt);
 
+    // The move action is considered a "value" action. The value is
+    // used as-is to move the player at each frame.
+    //
+    // This is different than event-based actions, such as the `fire` one.
     game.moveSpeed = move.value[1];
     game.update(dt, mouseInput.absolute);
     game.render();

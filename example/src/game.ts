@@ -64,33 +64,27 @@ export class Game {
         const speed = PLAYER_SPEED * this.moveSpeed * dt;
         vec2.scaleAndAdd(this.position, this.position, this.direction, speed);
 
-        /* Update bullets */
-        for (let i = this.bullets.length - 1; i >= 0; --i) {
-            const bullet = this.bullets[i];
+        // Update bullets & handle enemy destruction.
+        for (let bulletId = this.bullets.length - 1; bulletId >= 0; --bulletId) {
+            const bullet = this.bullets[bulletId];
 
             // Move the bullet along its travel path.
             vec2.scaleAndAdd(bullet.pos, bullet.pos, bullet.dir, BULLET_SPEED * dt);
 
-            /* Enemy killed */
-            let terminated = false;
+            // Check if the bullet is out-of-bounds.
+            if (!this._pointInsideCanvas(bullet.pos)) {
+                this.bullets.splice(bulletId, 1);
+                break;
+            }
+
+            // Check for bullet hiting enemies.
             for (let enemyId = this.enemies.length - 1; enemyId >= 0; --enemyId) {
                 if (vec2.sqrDist(this.enemies[enemyId], bullet.pos) > ENEMY_RADIUS_SQUARE) {
                     continue;
                 }
                 this.enemies.splice(enemyId, 1);
-                terminated = true;
+                this.bullets.splice(bulletId, 1);
                 break;
-            }
-
-            if (
-                terminated ||
-                /* Out of bounds */
-                bullet.pos[0] < 0.0 ||
-                bullet.pos[0] > this.width ||
-                bullet.pos[1] < 0.0 ||
-                bullet.pos[1] > this.height
-            ) {
-                this.bullets.splice(i, 1);
             }
         }
     }
@@ -187,5 +181,15 @@ export class Game {
 
         ctx.restore();
         ctx.resetTransform();
+    }
+
+    /**
+     * Check if a 2d point is inside a rectangle.
+     *
+     * @param p The point to check.
+     * @returns `true` if the point is inside the rectangle, `false` otherwise.
+     */
+    private _pointInsideCanvas(p: vec2): boolean {
+        return p[0] < 0.0 || p[0] > this.width || p[1] < 0.0 || p[1] > this.height;
     }
 }
