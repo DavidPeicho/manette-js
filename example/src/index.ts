@@ -113,7 +113,9 @@ manager.add(move, [
     }).setTrigger(new DownTrigger()),
 ]);
 manager.add(reset, [
-    new BooleanMapping(keyboardInput).setTrigger(new LongPressTrigger(2.0)),
+    new BooleanMapping(keyboardInput, KeyboardBinding.Space).setTrigger(
+        new LongPressTrigger(2.0)
+    ),
 ]);
 
 function animate() {

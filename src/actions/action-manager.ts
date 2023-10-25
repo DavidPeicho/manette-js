@@ -48,12 +48,21 @@ export class ActionManager {
     update(dt: number) {
         for (let i = 0; i < this._actions.length; ++i) {
             const action = this._actions[i];
-            const mappings = this._mappings[i];
             action.reset();
+
+            const mappings = this._mappings[i];
             for (const mapping of mappings) {
                 const match = mapping.update(action);
-                action.source = match ? mapping.source : null;
-                action.state = mapping.trigger?.update(action, dt) ?? TriggerState.None;
+                if (match) {
+                    action.source = mapping.source;
+                    action.state = mapping.trigger?.update(action, dt) ?? TriggerState.None;
+                } else {
+                    action.state =
+                        action.state === TriggerState.Started ||
+                        action.state === TriggerState.Ongoing
+                            ? TriggerState.Canceled
+                            : TriggerState.None;
+                }
                 switch (action.state) {
                     case TriggerState.Started:
                         action.started.notify(action);
@@ -70,7 +79,6 @@ export class ActionManager {
                     default:
                         break;
                 }
-                if (match) break;
             }
         }
     }

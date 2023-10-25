@@ -42,25 +42,34 @@ export class LongPressTrigger implements Trigger {
     duration: number;
     actuationSq = 0.5;
 
-    private _timer: number | null = null;
+    private _wasAcuated = false;
+    private _timer: number = Number.POSITIVE_INFINITY;
 
     constructor(duration: number = 1.0) {
         this.duration = duration;
     }
 
     update(action: Action, dt: number) {
-        const value = action.magnitudeSq();
-        const accuated = value >= this.actuationSq;
+        const wasAccuated = this._wasAcuated;
+        const accuated = action.magnitudeSq() >= this.actuationSq;
+        this._wasAcuated = accuated;
+
         if (!accuated) {
-            return this._timer !== null ? TriggerState.Canceled : TriggerState.None;
+            return action.running ? TriggerState.Canceled : TriggerState.None;
         }
 
-        if (this._timer === null) {
+        console.log(`${TriggerState[action.state]} ${this._timer}`);
+
+        const prevState = action.state;
+        if (action.state === TriggerState.None && !wasAccuated) {
             this._timer = this.duration;
             return TriggerState.Started;
         }
+        if (action.running) {
+            this._timer -= dt;
+            return this._timer > 0.0 ? TriggerState.Ongoing : TriggerState.Completed;
+        }
 
-        this._timer -= dt;
-        return this._timer > 0.0 ? TriggerState.Ongoing : TriggerState.Completed;
+        return TriggerState.None;
     }
 }
