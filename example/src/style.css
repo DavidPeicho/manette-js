@@ -53,6 +53,7 @@ svg > path {
 }
 
 .content {
+    position: relative;
     display: flex;
     width: 100%;
     max-height: 420px;
@@ -103,6 +104,14 @@ svg > path {
 
 .quote {
     color: #888;
+}
+
+.overlay {
+    position: absolute;
+    bottom: 0;
+    right: 32px;
+    font-size: 28px;
+    color: #f9f9f9;
 }
 
 @media (prefers-color-scheme: light) {

@@ -10,6 +10,7 @@ export enum TriggerState {
 
 export interface Trigger {
     update(action: Action, dt: number): TriggerState;
+    reset(): void;
 }
 
 export class PressTrigger implements Trigger {
@@ -27,6 +28,10 @@ export class PressTrigger implements Trigger {
         this._wasPressed = accuated;
         return TriggerState.None;
     }
+
+    reset() {
+        this._wasPressed = false;
+    }
 }
 
 export class DownTrigger implements Trigger {
@@ -36,6 +41,8 @@ export class DownTrigger implements Trigger {
         const value = action.magnitudeSq();
         return value >= this.actuationSq ? TriggerState.Completed : TriggerState.None;
     }
+
+    reset(): void {}
 }
 
 export class LongPressTrigger implements Trigger {
@@ -58,9 +65,6 @@ export class LongPressTrigger implements Trigger {
             return action.running ? TriggerState.Canceled : TriggerState.None;
         }
 
-        console.log(`${TriggerState[action.state]} ${this._timer}`);
-
-        const prevState = action.state;
         if (action.state === TriggerState.None && !wasAccuated) {
             this._timer = this.duration;
             return TriggerState.Started;
@@ -71,5 +75,10 @@ export class LongPressTrigger implements Trigger {
         }
 
         return TriggerState.None;
+    }
+
+    reset(): void {
+        this._wasAcuated = false;
+        this._timer = Number.POSITIVE_INFINITY;
     }
 }

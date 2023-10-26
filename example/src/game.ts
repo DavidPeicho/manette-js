@@ -15,7 +15,9 @@ const ENEMY_RADIUS_SQUARE = ENEMY_RADIUS * ENEMY_RADIUS;
  * the example's action mapping setup easy to follow.
  */
 export class Game {
+    /** Canvas */
     canvas: HTMLCanvasElement;
+    /** Canvas 2d context for drawing */
     ctx: CanvasRenderingContext2D;
     /** Canvas width, in CSS pixels */
     width = 0;
@@ -46,7 +48,8 @@ export class Game {
         // Compute the absolute position of the player on the entire web page.
         // This will allow to get the direction from the player toward the mouse.
         const canvas = this.canvas;
-        const pagePos = vec2.set(this.direction, canvas.offsetLeft, canvas.offsetTop);
+        const bounds = canvas.getBoundingClientRect();
+        const pagePos = vec2.set(this.direction, bounds.x, bounds.y);
         vec2.add(this.direction, this.direction, this.position);
         vec2.sub(this.direction, mousePos, pagePos);
         vec2.normalize(this.direction, this.direction);
@@ -193,6 +196,6 @@ export class Game {
      * @returns `true` if the point is inside the rectangle, `false` otherwise.
      */
     private _pointInsideCanvas(p: vec2): boolean {
-        return p[0] < 0.0 || p[0] > this.width || p[1] < 0.0 || p[1] > this.height;
+        return p[0] >= 0.0 && p[0] < this.width && p[1] >= 0.0 && p[1] < this.height;
     }
 }
