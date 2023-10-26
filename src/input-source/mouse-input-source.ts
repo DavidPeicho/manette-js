@@ -1,5 +1,5 @@
 import {Emitter} from '../utils/event.js';
-import {InputSource, testButtons} from './input.js';
+import {InputSource} from './input.js';
 
 export enum MouseButtonBinding {
     Primary = 1,
@@ -47,8 +47,9 @@ export class MouseInputSource extends InputSource {
         window.removeEventListener('pointermove', this.#onMouseMove);
     }
 
-    groupPressed(buttons: Uint8Array): boolean {
-        return testButtons(buttons, this.buttons);
+    pressed(button: number): boolean {
+        const value = button - 1;
+        return !!(this.buttons & (1 << value));
     }
 
     get mouseNDC(): Float32Array {
@@ -65,6 +66,7 @@ export class MouseInputSource extends InputSource {
         this.#mouseNDC[1] = (e.clientY / height) * 2.0 - 1.0;
     }
     private _onMousePress(e: PointerEvent) {
+        console.log(e.buttons);
         this.buttons = e.buttons;
         this.#onPress.notify(e);
     }

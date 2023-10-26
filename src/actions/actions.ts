@@ -109,7 +109,7 @@ export class Action {
     }
 
     /**
-     * Identifier of this action.
+     * Identifier for this action.
      *
      * This must be unique per {@link ActionManager} instances.
      */

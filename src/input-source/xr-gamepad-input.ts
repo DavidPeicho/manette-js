@@ -1,4 +1,4 @@
-import {InputSource, isAxisNonZero, testButtons} from './input.js';
+import {InputSource, isAxisNonZero} from './input.js';
 
 export enum Handedness {
     Left = 0,
@@ -61,13 +61,14 @@ export class XRGamepadInput extends InputSource {
         this.#touched = 0;
         for (let i = 0; i < buttons.length; ++i) {
             const button = buttons[i];
-            this.#pressed &= button.pressed ? 1 << (i + 1) : ~0;
-            this.#touched &= button.touched ? 1 << (i + 1) : ~0;
+            this.#pressed &= button.pressed ? 1 << i : ~0;
+            this.#touched &= button.touched ? 1 << i : ~0;
         }
     }
 
-    groupPressed(buttons: Uint8Array): boolean {
-        return testButtons(buttons, this.#pressed);
+    pressed(button: XRButtonBinding): boolean {
+        const value = button - 1;
+        return !!(this.#pressed & (1 << value));
     }
 
     axis2d(out: Float32Array, button: XRAxisBinding): boolean {
