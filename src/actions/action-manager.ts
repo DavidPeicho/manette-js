@@ -1,6 +1,6 @@
 import {InputSource} from '../input-source/input.js';
 import {Mapping} from '../mapping.js';
-import {TriggerState} from '../trigger.js';
+import {Trigger, TriggerState} from '../trigger.js';
 import {Action} from './actions.js';
 
 export class ActionManager {
@@ -8,6 +8,7 @@ export class ActionManager {
 
     readonly _sources: InputSource[];
     readonly _actions: Action[] = [];
+    readonly _triggers: (Trigger | null)[] = [];
     readonly _mappings: Mapping[][] = [];
 
     constructor(sources: InputSource[]) {
@@ -47,21 +48,50 @@ export class ActionManager {
 
     update(dt: number) {
         for (let i = 0; i < this._actions.length; ++i) {
-            const action = this._actions[i];
+            const trigger = this._triggers[i];
             const mappings = this._mappings[i];
+            const action = this._actions[i];
             action.reset();
+
+            let match: Mapping | null = null;
             for (const mapping of mappings) {
-                const match = mapping.update(action);
-                action.source = match ? mapping.source : null;
-                action.state = mapping.trigger?.update(action) ?? TriggerState.None;
-                switch (action.state) {
-                    case TriggerState.Completed:
-                        action.completed.notify(action);
-                        break;
-                    default:
-                        break;
+                if (mapping.update(action)) {
+                    match = mapping;
+                    break;
                 }
-                if (match) break;
+            }
+
+            if (!match || match.trigger !== trigger) {
+                if (action.running) {
+                    action.state = TriggerState.Canceled;
+                    action.canceled.notify(action);
+                } else {
+                    action.state = TriggerState.None;
+                }
+                trigger?.reset();
+            }
+            if (!match) continue;
+
+            action.source = match.source;
+            if (match.trigger) {
+                action.state = match.trigger.update(action, dt);
+                this._triggers[i] = match.trigger;
+            }
+            switch (action.state) {
+                case TriggerState.Started:
+                    action.started.notify(action);
+                    break;
+                case TriggerState.Ongoing:
+                    action.ongoing.notify(action);
+                    break;
+                case TriggerState.Canceled:
+                    action.canceled.notify(action);
+                    break;
+                case TriggerState.Completed:
+                    action.completed.notify(action);
+                    break;
+                default:
+                    break;
             }
         }
     }

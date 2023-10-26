@@ -5,6 +5,7 @@ export class Action {
     private readonly _name: string;
 
     started = new Emitter<[Action]>();
+    ongoing = new Emitter<[Action]>();
     completed = new Emitter<[Action]>();
     canceled = new Emitter<[Action]>();
 
@@ -15,17 +16,20 @@ export class Action {
         this._name = name;
     }
 
-    get name() {
-        return this._name;
-    }
-
     reset() {
         this.source = null;
-        this.state = TriggerState.None;
     }
 
     magnitudeSq() {
         return 0.0;
+    }
+
+    get running() {
+        return this.state === TriggerState.Started || this.state === TriggerState.Ongoing;
+    }
+
+    get name() {
+        return this._name;
     }
 }
 

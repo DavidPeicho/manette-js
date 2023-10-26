@@ -12,13 +12,17 @@ import {
     EmulatedAxis2dMapping,
     KeyboardBinding,
     KeyboardInputSource,
+    LongPressTrigger,
     MouseButtonBinding,
     MouseInputSource,
 } from 'haptic-js';
 
 import {Game} from './game.js';
 
+// Input interface, contains the list of commands.
 const ui = document.getElementById('ui')!;
+// Overlay displaying "Restarting...".
+const restartOverlay = document.querySelector('.overlay') as HTMLElement;
 
 /**
  * Append an action in the UI.
@@ -71,12 +75,22 @@ keyboardInput.enable(document.body);
 
 // Triggered when the player moves.
 const move = new Axis2dAction('Move');
+
 // Triggered when the player shoots.
 const fire = new BooleanAction('Fire');
 fire.completed.add(() => game.spawnBullet()); // Fire bullet upon event.
 
-// Whenever any of the action triggers, update the UI.
-for (const action of [fire, move]) {
+// Triggered when the player holds the restart button.
+const reset = new BooleanAction('ResetGame');
+reset.started.add(() => (restartOverlay.style.display = 'initial'));
+reset.canceled.add(() => (restartOverlay.style.display = 'none'));
+reset.completed.add(() => {
+    restartOverlay.style.display = 'none';
+    game.reset();
+});
+
+// Whenever any of the action is completed, update the UI.
+for (const action of [fire, move, reset]) {
     action.completed.add(updateUI);
 }
 
@@ -107,6 +121,11 @@ manager.add(move, [
         minY: KeyboardBinding.ArrowDown,
         maxX: KeyboardBinding.ArrowRight,
     }).setTrigger(new DownTrigger()),
+]);
+manager.add(reset, [
+    new BooleanMapping(keyboardInput, KeyboardBinding.Space).setTrigger(
+        new LongPressTrigger(1.0)
+    ),
 ]);
 
 function animate() {

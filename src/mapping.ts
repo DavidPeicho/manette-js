@@ -22,10 +22,15 @@ export class Mapping {
 
     validate(action: Action): void {}
 
-    protected _validateSourceButtons(...buttons: number[]) {
+    protected _validateSourceButtons(name: string, ...buttons: number[]) {
+        let anyValid = false;
         for (const button of buttons) {
             if (!button) continue;
             this.source.validateButton(button);
+            anyValid = true;
+        }
+        if (!anyValid) {
+            throw new Error(`${name} has no buttons set`);
         }
     }
 }
@@ -60,7 +65,7 @@ export class BooleanMapping extends Mapping {
                     `\tAction '${action.name}' has a non-compatible value of type ${type}.`
             );
         }
-        this._validateSourceButtons(...this.buttons);
+        this._validateSourceButtons('BooleanMapping', ...this.buttons);
     }
 }
 
@@ -131,6 +136,6 @@ export class EmulatedAxis2dMapping extends Mapping {
                     '\tEmulatedAxis2dMapping can only be used with axis2d actions.'
             );
         }
-        this._validateSourceButtons(...this.buttons);
+        this._validateSourceButtons('EmulatedAxis2dMapping', ...this.buttons);
     }
 }
