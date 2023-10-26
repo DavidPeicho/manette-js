@@ -13,7 +13,7 @@ import {
     KeyboardBinding,
     KeyboardInputSource,
     LongPressTrigger,
-    MouseButtonBinding,
+    MouseBinding,
     MouseInputSource,
 } from 'haptic-js';
 
@@ -103,7 +103,7 @@ for (const action of [fire, move, reset]) {
 
 const manager = new ActionManager([mouseInput, keyboardInput]);
 manager.add(fire, [
-    new BooleanMapping(mouseInput, MouseButtonBinding.Primary),
+    new BooleanMapping(mouseInput, MouseBinding.Primary),
     new BooleanMapping(keyboardInput, KeyboardBinding.Enter),
 ]);
 manager.add(move, [

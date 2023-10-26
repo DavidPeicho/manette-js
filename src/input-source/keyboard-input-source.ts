@@ -1,6 +1,7 @@
 import {Emitter} from '../utils/event.js';
 import {InputSource} from './input.js';
 
+/** Binding for keyboard button. */
 export enum KeyboardBinding {
     KeyA = 0x1,
     KeyS = 0x2,
@@ -136,34 +137,60 @@ function toBit32(bit128: number) {
     return 1 << bit128 % 32;
 }
 
+/**
+ * Keyboard input source.
+ *
+ * ## Usage
+ *
+ * ```js
+ * const keyboard = new KeyboardInputSource('keyboard');
+ * enable(document.body); // Registers listeners.
+ *
+ * // Checks whether the space bar button is pressed or not.
+ * console.log(keyboard.pressed(KeyboardBinding.Space));
+ * ```
+ */
 export class KeyboardInputSource extends InputSource {
-    /** No more than 4 * 32 keys. */
-    bitset: Int32Array = new Int32Array(4);
+    /** Bitset for pressed buttons. @hidden */
+    #bitset: Int32Array = new Int32Array(4);
 
+    /** HTML elements for event listeners. @hidden */
     #element: HTMLElement | Window = window;
 
+    /* Listeners */
+
+    /** Emitter for press event. @hidden */
     #onPress = new Emitter<[KeyboardEvent]>();
+    /** Emitter for release event. @hidden */
     #onRelease = new Emitter<[KeyboardEvent]>();
 
+    /** Triggered upon key press. @hidden */
     #onKeyPress = (e: KeyboardEvent) => {
         const bit128 = convertKeyCode(e.code);
         const index = toBitSetIndex(bit128);
-        this.bitset[index] |= toBit32(bit128);
+        this.#bitset[index] |= toBit32(bit128);
         this.#onPress.notify(e);
     };
+    /** Triggered upon key release. @hidden */
     #onKeyRelease = (e: KeyboardEvent) => {
         const bit128 = convertKeyCode(e.code);
         const index = toBitSetIndex(bit128);
-        this.bitset[index] &= ~toBit32(bit128);
+        this.#bitset[index] &= ~toBit32(bit128);
         this.#onRelease.notify(e);
     };
 
+    /**
+     * Register keyboard event listeners on the given HTML element.
+     *
+     * @param element The element to register on.
+     */
     enable(element: HTMLElement | Window = window) {
         this.#element = element as HTMLElement;
         this.#element.addEventListener('keydown', this.#onKeyPress);
         this.#element.addEventListener('keyup', this.#onKeyRelease);
     }
 
+    /** Disable the keyboard listeners. */
     disable() {
         const elt = this.#element as HTMLElement;
         elt.removeEventListener('keydown', this.#onKeyPress);
@@ -171,11 +198,13 @@ export class KeyboardInputSource extends InputSource {
         this.#element = window;
     }
 
+    /** @inheritdoc */
     pressed(button: number): boolean {
         const index = toBitSetIndex(button);
-        return !!(this.bitset[index] & toBit32(button));
+        return !!(this.#bitset[index] & toBit32(button));
     }
 
+    /** @inheritdoc */
     validateButton(button: number) {
         if (KeyboardBinding[button] === undefined) {
             throw new Error(
@@ -185,10 +214,34 @@ export class KeyboardInputSource extends InputSource {
         }
     }
 
+    /**
+     * Emitter for raw keyboard press events.
+     *
+     * ## Usage
+     *
+     * ```js
+     * const keyboard = new KeyboardInputSource('keyboard');
+     * keyboard.onPress.add((e) => {
+     *     console.log('Raw press event: ', e);
+     * });
+     * ```
+     */
     get onPress() {
         return this.#onPress;
     }
 
+    /**
+     * Emitter for raw keyboard release events.
+     *
+     * ## Usage
+     *
+     * ```js
+     * const keyboard = new KeyboardInputSource('keyboard');
+     * keyboard.onRelease.add((e) => {
+     *     console.log('Raw release event: ', e);
+     * });
+     * ```
+     */
     get onRelease() {
         return this.#onRelease;
     }
