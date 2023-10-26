@@ -24,5 +24,6 @@ Getting started:
 
 ## ToDo
 
-* [ ] Map multiple key to axis
-* [ ] Validate binding <> action
+* [ ] Action mapping context
+* [ ] Serialization & Deserialization of the action manager state
+* [ ] Touch support

@@ -8,6 +8,9 @@ export enum TriggerState {
     Completed = 1 << 3,
 }
 
+/**
+ *
+ */
 export interface Trigger {
     update(action: Action, dt: number): TriggerState;
     reset(): void;

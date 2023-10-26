@@ -42,6 +42,15 @@ svg > path {
     stroke: #cccccc;
 }
 
+a {
+    font-weight: 500;
+    color: #646cff;
+    text-decoration: inherit;
+}
+a:hover {
+    filter: drop-shadow(0 0 32px #5c60afaa);
+}
+
 #app {
     display: flex;
     flex-direction: column;

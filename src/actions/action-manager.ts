@@ -20,7 +20,7 @@ export class ActionManager {
 
     add(action: Action, mappings: Mapping[]): this {
         if (this.validate && this.actionId(action) !== null) {
-            throw new Error(`action ${action.name} already added. Update the mapping`);
+            throw new Error(`action ${action.id} already added. Update the mapping`);
         }
         const actionId = this._actions.length;
         this._actions.push(action);
@@ -63,18 +63,18 @@ export class ActionManager {
 
             if (!match || match.trigger !== trigger) {
                 if (action.running) {
-                    action.state = TriggerState.Canceled;
+                    (action._state as TriggerState) = TriggerState.Canceled;
                     action.canceled.notify(action);
                 } else {
-                    action.state = TriggerState.None;
+                    (action._state as TriggerState) = TriggerState.None;
                 }
                 trigger?.reset();
             }
             if (!match) continue;
 
-            action.source = match.source;
+            (action._source as InputSource) = match.source;
             if (match.trigger) {
-                action.state = match.trigger.update(action, dt);
+                (action._state as TriggerState) = match.trigger.update(action, dt);
                 this._triggers[i] = match.trigger;
             }
             switch (action.state) {
@@ -97,7 +97,7 @@ export class ActionManager {
     }
 
     actionId(target: Action) {
-        const index = this._actions.findIndex((action) => action.name === target.name);
+        const index = this._actions.findIndex((action) => action.id === target.id);
         return index >= 0 ? index : null;
     }
 }

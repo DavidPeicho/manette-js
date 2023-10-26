@@ -62,7 +62,7 @@ export class BooleanMapping extends Mapping {
         if (type !== 'boolean' && type !== 'number') {
             throw new Error(
                 'BooleanMapping can only be used with boolean / numeric actions.\n' +
-                    `\tAction '${action.name}' has a non-compatible value of type ${type}.`
+                    `\tAction '${action.id}' has a non-compatible value of type ${type}.`
             );
         }
         this._validateSourceButtons('BooleanMapping', ...this.buttons);
@@ -86,7 +86,7 @@ export class Axis2dMapping extends Mapping {
         if (!Array.isArray(value)) {
             throw new Error(
                 'Axis2dMapping can only be used with axis2d actions.\n' +
-                    `\tAction '${action.name}' has a non-array value.`
+                    `\tAction '${action.id}' has a non-array value.`
             );
         }
         this.source.validateAxis(this.button);
@@ -132,7 +132,7 @@ export class EmulatedAxis2dMapping extends Mapping {
         const type = typeof value;
         if (type !== 'object') {
             throw new Error(
-                `Action '${action.name}' has a non-array value, found type '${type}'.\n` +
+                `Action '${action.id}' has a non-array value, found type '${type}'.\n` +
                     '\tEmulatedAxis2dMapping can only be used with axis2d actions.'
             );
         }

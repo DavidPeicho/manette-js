@@ -31,19 +31,19 @@ const restartOverlay = document.querySelector('.overlay') as HTMLElement;
  */
 function updateUI(action: Action) {
     let last = (ui.children[0] as HTMLElement).querySelector('p[action-id]');
-    if (!last || last.getAttribute('action-id') !== action.name) {
+    if (!last || last.getAttribute('action-id') !== action.id) {
         const div = document.createElement('div');
         div.classList.add('action');
         div.innerHTML = `
             ${action.source!.id === 'keyboard' ? keyboardSVG : mouseSVG}
-            <p action-id=${action.name} count="0">Action</p>
+            <p action-id=${action.id} count="0">Action</p>
         `;
         last = div.children[1];
         ui.prepend(div);
     }
     const count = `${parseInt(last.getAttribute('count')!) + 1}`;
     last.setAttribute('count', count);
-    last.innerHTML = `${action.name} x${count}`;
+    last.innerHTML = `${action.id} x${count}`;
 }
 
 // Contains the game logic, i.e., player, bullets & enemy logic.
