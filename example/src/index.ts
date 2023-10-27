@@ -101,7 +101,7 @@ for (const action of [fire, move, reset]) {
  * frame in order to notify the attached triggers.
  */
 
-const manager = new ActionManager([mouseInput, keyboardInput]);
+const manager = new ActionManager();
 manager.add(fire, [
     new BooleanMapping(mouseInput, MouseBinding.Primary),
     new BooleanMapping(keyboardInput, KeyboardBinding.Enter),

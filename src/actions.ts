@@ -1,4 +1,5 @@
 import {InputSource} from './input-source/input.js';
+import {Trigger} from './trigger.js';
 import {Emitter} from './utils/event.js';
 
 /**
@@ -93,11 +94,14 @@ export class Action {
      */
     readonly completed = new Emitter<[Action]>();
 
-    /** The last source that activated this action. @hidden */
+    /** Last source that activated this action. @hidden */
     readonly _source: InputSource | null = null;
 
-    /** The state the action is currently in. @hidden */
+    /** State the action is currently in. @hidden */
     readonly _state = TriggerState.None;
+
+    /** Trigger that last modified this action's state. @hidden */
+    readonly _trigger: Trigger | null = null;
 
     /** Identifier for this action. @hidden */
     private readonly _id: string;
@@ -119,6 +123,11 @@ export class Action {
     /** {@link TriggerState} in which the action is currently in. */
     get state() {
         return this._state;
+    }
+
+    /** {@link Trigger} that last modified this action's state. */
+    get trigger() {
+        return this._trigger;
     }
 
     /** The last source that activated this action. */
