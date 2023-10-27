@@ -1,7 +1,7 @@
-import {Action} from './actions.js';
+import {Action, TriggerState} from './actions.js';
 import {InputSource} from './input-source/input.js';
 import {Mapping} from './mapping.js';
-import {Trigger, TriggerState} from './trigger.js';
+import {Trigger} from './trigger.js';
 
 /**
  * Links {@link Action}, {@link Mapping}, and {@link Trigger} together.

@@ -1,6 +1,28 @@
 import {InputSource} from './input-source/input.js';
-import {TriggerState} from './trigger.js';
 import {Emitter} from './utils/event.js';
+
+/**
+ * Current state assigned to an action by a {@link Trigger}.
+ */
+export enum TriggerState {
+    /** The action isn't processed, the mapping doesn't match. */
+    None = 0,
+
+    /** The action was previously {@link TriggerState.None} and just started. */
+    Started = 1 << 0,
+
+    /** The action was previously {@link TriggerState.Started}, but isn't yet completed. */
+    Ongoing = 1 << 1,
+
+    /**
+     * The action was {@link TriggerState.Started} or {@link TriggerState.Ongoing},
+     * but was just canceled.
+     */
+    Canceled = 1 << 2,
+
+    /** The action succeeded. */
+    Completed = 1 << 3,
+}
 
 /**
  * Actions associate a value to a behavior in the application.
