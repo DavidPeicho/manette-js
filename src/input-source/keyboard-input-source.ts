@@ -1,7 +1,12 @@
 import {Emitter} from '../utils/event.js';
 import {InputSource} from './input.js';
 
-/** Binding for keyboard button. */
+/**
+ * Binding for keyboard button.
+ *
+ * @note Each key maps to a value (with an offset of `1`) in the table:
+ * https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_code_values#code_values_on_mac
+ */
 export enum KeyboardBinding {
     KeyA = 0x1,
     KeyS = 0x2,
@@ -199,7 +204,7 @@ export class KeyboardInputSource extends InputSource {
     }
 
     /** @inheritdoc */
-    pressed(button: number): boolean {
+    pressed(button: KeyboardBinding): boolean {
         const index = toBitSetIndex(button);
         return !!(this.#bitset[index] & toBit32(button));
     }

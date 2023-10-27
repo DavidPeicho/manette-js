@@ -37,7 +37,7 @@ export class MouseInputSource extends InputSource {
     #mouseNDC = new Float32Array(2);
 
     /** HTML element for pointer event listeners. @hidden */
-    #element: HTMLElement | Window = window;
+    #element: HTMLElement | Document = document;
 
     /** Triggered on mouse press. @hidden */
     #onMousePress = this._onMousePress.bind(this);
@@ -58,7 +58,7 @@ export class MouseInputSource extends InputSource {
      *
      * @param element The element to register on.
      */
-    enable(element: HTMLElement | Window = window) {
+    enable(element: HTMLElement | Document = document) {
         this.#element = element as HTMLElement;
         this.#element.addEventListener('pointerdown', this.#onMousePress);
         this.#element.addEventListener('pointerup', this.#onMouseRelease);
@@ -78,7 +78,7 @@ export class MouseInputSource extends InputSource {
     }
 
     /** @inheritdoc */
-    pressed(button: number): boolean {
+    pressed(button: MouseBinding): boolean {
         const value = button - 1;
         return !!(this.#buttons & (1 << value));
     }
@@ -127,8 +127,9 @@ export class MouseInputSource extends InputSource {
 
     /** Process mouse move events. @hidden */
     private _onMouseMove(e: PointerEvent) {
-        const width = document.body.clientWidth;
-        const height = document.body.clientHeight;
+        const elt = this.#element as HTMLElement;
+        const width = elt.clientWidth;
+        const height = elt.clientHeight;
         this.#mouseAbsolute[0] = e.clientX;
         this.#mouseAbsolute[1] = e.clientY;
 
@@ -138,7 +139,6 @@ export class MouseInputSource extends InputSource {
 
     /** Process mouse press events. @hidden */
     private _onMousePress(e: PointerEvent) {
-        console.log(e.buttons);
         this.#buttons = e.buttons;
         this.#onPress.notify(e);
     }

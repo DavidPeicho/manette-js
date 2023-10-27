@@ -17,8 +17,8 @@ export enum XRButtonBinding {
 
 /** Binding for XR axis buttons. */
 export enum XRAxisBinding {
-    Touchpad = 0,
-    Joystick = 1,
+    Touchpad = 1,
+    Joystick = 2,
 }
 
 /**
@@ -42,7 +42,7 @@ export enum XRAxisBinding {
  * console.log(right.pressed(XRButtonBinding.Trigger));
  * ```
  */
-export class XRGamepadInput extends InputSource {
+export class XRGamepadInputSource extends InputSource {
     /** XR input source. @hidden */
     #xrInputSource: XRInputSource | null = null;
 
@@ -110,7 +110,7 @@ export class XRGamepadInput extends InputSource {
         const gamepad = this.#xrInputSource?.gamepad;
         if (!gamepad) return false;
 
-        const i = button * 2;
+        const i = (button - 1) * 2;
         out[0] = gamepad.axes[i];
         out[1] = gamepad.axes[i + 1];
 
