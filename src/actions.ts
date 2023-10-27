@@ -1,5 +1,6 @@
-import {InputSource, TriggerState} from '../index.js';
-import {Emitter} from '../utils/event.js';
+import {InputSource} from './input-source/input.js';
+import {TriggerState} from './trigger.js';
+import {Emitter} from './utils/event.js';
 
 /**
  * Actions associate a value to a behavior in the application.
@@ -12,7 +13,7 @@ import {Emitter} from '../utils/event.js';
  *
  * ## Value
  *
- * There are multiple action type:
+ * There are multiple action types:
  * * {@link BooleanAction}: boolean value
  * * {@link Axis2dAction}: axis2d value (`Float32Array`)
  *

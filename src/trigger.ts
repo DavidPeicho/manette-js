@@ -1,4 +1,4 @@
-import {Action} from './actions/actions.js';
+import {Action} from './actions.js';
 
 export enum TriggerState {
     None = 0,
