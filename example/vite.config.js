@@ -1,3 +1,3 @@
 export default {
-    base: '/haptic-js/'
+    base: '/manette-js/'
 }

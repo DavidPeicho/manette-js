@@ -1,8 +1,8 @@
-# haptic-js
+# manette-js
 
 Input & action mapping library for JavaScript.
 
-> 🚧 haptic-js is released as a beta until the API is stabilized 🚧
+> 🚧 manette-js is released as a beta until the API is stabilized 🚧
 
 ![](./img/example.png)
 
@@ -19,7 +19,7 @@ Input & action mapping library for JavaScript.
 
 Getting started:
 
-* [Example Demo](https://davidpeicho.github.io/haptic-js/)
+* [Example Demo](https://davidpeicho.github.io/manette-js/)
 * [Example Source](./example/src/index.ts)
 
 ## Install
@@ -27,13 +27,13 @@ Getting started:
 Using `npm`:
 
 ```sh
-npm i haptic-js
+npm i manette-js
 ```
 
 Using `yarn`:
 
 ```sh
-yarn add haptic-js
+yarn add manette-js
 ```
 
 ## Usage Example
@@ -49,7 +49,7 @@ import {
     MouseDevice,
     XRDevice,
     Handedness,
-} from 'haptic-js';
+} from 'manette-js';
 
 // Player performs a fire action.
 const fire = new BooleanAction();

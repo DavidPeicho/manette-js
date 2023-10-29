@@ -1,7 +1,7 @@
 {
-  "name": "hapticjs-example",
+  "name": "manette-js-example",
   "version": "1.0.0",
-  "description": "haptic-js basic example",
+  "description": "manette-js basic example",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -13,6 +13,6 @@
   },
   "dependencies": {
     "gl-matrix": "^3.4.3",
-    "haptic-js": "link:../"
+    "manette-js": "link:../"
   }
 }

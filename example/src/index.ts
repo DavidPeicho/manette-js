@@ -18,7 +18,7 @@ import {
     MouseBinding,
     MouseDevice,
     PressTrigger,
-} from 'haptic-js';
+} from 'manette-js';
 
 import {Game} from './game.js';
 
