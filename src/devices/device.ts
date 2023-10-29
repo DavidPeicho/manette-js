@@ -1,13 +1,16 @@
 import {EPSILON} from '../constants.js';
 
 /**
- * Base class for any device, such as keyboard, mouse,
+ * Base class for any device, such as a keyboard, mouse,
  * or gamepad.
  */
 export class Device {
     /** Identifier of the device. @hidden */
     #id: string;
 
+    /**
+     * @param id Unique identifier.
+     */
     constructor(id: string) {
         this.#id = id;
     }
@@ -17,7 +20,7 @@ export class Device {
      *
      * @note This method relies on {@link Device.pressed}.
      *
-     * @param buttons Buttons id to check.
+     * @param buttons Buttons IDs to check.
      * @returns `true` if the buttons are pressed, `false` otherwise.
      */
     groupPressed(buttons: Uint8Array): boolean {
@@ -30,9 +33,9 @@ export class Device {
     }
 
     /**
-     * Gets the floating point value associated to a boolean button.
+     * Get the floating point value associated to a boolean button.
      *
-     * @returns Accuation value.
+     * @returns Actuation value.
      */
     value(button: number): number {
         return this.pressed(button) ? 1.0 : 0.0;
@@ -41,7 +44,7 @@ export class Device {
     /**
      * Check whether a button is pressed or not.
      *
-     * @param button Button id to check.
+     * @param button Button ID to check.
      * @returns `true` if the button is pressed, `false` otherwise.
      */
     pressed(button: number): boolean {
@@ -52,7 +55,7 @@ export class Device {
      * Read the value from a 2d axis button, such as a joypad / touchpad.
      *
      * @param out Destination array.
-     * @param button Button id to read from.
+     * @param button Button ID to read from.
      * @returns `true` if the axis is activated, i.e., non-zero.
      */
     axis2d(out: Float32Array, button: number): boolean {
@@ -60,20 +63,20 @@ export class Device {
     }
 
     /**
-     * Validate that the given button id exists in this device.
+     * Validate that the given button ID exists on this device.
      *
      * @note This method throws if the button doesn't exist.
      *
-     * @param button Button id to check.
+     * @param button Button ID to check.
      */
     validateButton(button: number) {}
 
     /**
-     * Validate that the given button axis button exists in this device.
+     * Validate that the given button axis button exists on this device.
      *
      * @note This method throws if the button doesn't exist.
      *
-     * @param button Button id to check.
+     * @param button Button ID to check.
      */
     validateAxis(button: number) {}
 

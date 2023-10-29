@@ -4,11 +4,11 @@ import {Mapping} from './mapping.js';
 import {Trigger} from './trigger.js';
 
 /**
- * Link actions to one / multiple mappings.
+ * Link actions to one or multiple mappings.
  *
  * The manager {@link ActionManager.update} method is in charge of:
- * * Checking for mapping match (button down, joystick moved)
- * * Triggering action's state change
+ * * Checking for mapping match (button down, joystick moved, etc...)
+ * * Triggering action state changes
  *
  * ## Usage
  *
@@ -36,7 +36,7 @@ import {Trigger} from './trigger.js';
  */
 export class ActionManager {
     /**
-     * Validate action & mapping upon addition.
+     * Validate action and mappings upon addition.
      *
      * @note Disable in production for performance reasons.
      */
@@ -45,7 +45,7 @@ export class ActionManager {
     /** List of managed actions. @hidden */
     readonly _actions: Action[] = [];
 
-    /** One list of mappings per action. @hidden */
+    /** Mappings per action. @hidden */
     readonly _mappings: Mapping[][] = [];
 
     /**
@@ -54,7 +54,7 @@ export class ActionManager {
      * @note If the action is already added, use {@link ActionManager.setMapping} instead.
      *
      * @param action The action to add.
-     * @param mappings The list of mappings that modify the action.
+     * @param mappings The mappings that modify the action.
      *
      * @returns This instance, for chaining.
      */
@@ -105,7 +105,7 @@ export class ActionManager {
      * @note **Throws** if the action wasn't previously added.
      *
      * @param actionId The action, an id, or its index in the manager.
-     * @param mappings The list of mappings.
+     * @param mappings The mappings.
      *
      * @returns This instance, for chaining.
      */
@@ -126,7 +126,7 @@ export class ActionManager {
     }
 
     /**
-     * Retrive the mapping of the action at index `index`.
+     * Retrieve the mappings of the action at index `index`.
      *
      * @note **Throws** if the action wasn't previously added.
      *

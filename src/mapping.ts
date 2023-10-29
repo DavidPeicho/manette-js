@@ -1,13 +1,10 @@
-import {EPSILON} from './constants.js';
 import {Action, Axis2dAction, BooleanAction} from './actions.js';
 import {Device, isAxisNonZero} from './devices/device.js';
-import {PressTrigger, Trigger} from './trigger.js';
+import {Trigger} from './trigger.js';
 
 /**
- * A mapping is used to activate an action based on an interaction from
- * a selected {@link Device}.
- *
- * The mapping thus links an {@link Device} and a {@link Trigger} to an {@link Action}.
+ * A mapping updates an action's value and state based on a
+ * specific binding from a {@link Device}.
  *
  * The different types of mapping are used to assign the action a value upon match:
  * * {@link BooleanMapping}: Maps a boolean button from a device
@@ -21,11 +18,11 @@ import {PressTrigger, Trigger} from './trigger.js';
  * ## Usage
  *
  * ```js
- * const booleanAction = new BooleanAction();
+ * const action = new BooleanAction();
  *
  * // Binds the 'Left' mouse button, 'Enter' keyboard key, and 'Trigger'
- * // gamepad button to the `booleanAction`.
- * manager.add(booleanAction, [
+ * // gamepad button to the `action`.
+ * manager.add(action, [
  *   new BooleanMapping(mouse, MouseBinding.Primary),
  *   new BooleanMapping(keyboard, KeyboardBinding.Enter),
  *   new BooleanMapping(gamepad, XRButtonBinding.Trigger),
@@ -40,9 +37,9 @@ import {PressTrigger, Trigger} from './trigger.js';
  * {@link Action.ongoing}, {@link Action.canceled}, and {@link Action.completed} events.
  *
  * ```js
- * const booleanAction = new BooleanAction();
+ * const action = new BooleanAction();
  *
- * manager.add(booleanAction, [
+ * manager.add(action, [
  *   // Triggers when the mouse 'Left' button is pressed.
  *   new BooleanMapping(mouse, MouseBinding.Primary)
  *       .setTrigger(new PressTrigger()),
@@ -52,13 +49,13 @@ import {PressTrigger, Trigger} from './trigger.js';
  * ]);
  * ```
  *
- * For more information about trigger, have a look at the {@link Trigger} documentation.
+ * For more information about triggers, have a look at the {@link Trigger} documentation.
  */
 export class Mapping {
     /** {@link Device} to read from. */
     device: Device;
 
-    /** Optional trigger modifyinh the action's state. */
+    /** Optional trigger modifyinf the action's state. */
     trigger: Trigger | null = null;
 
     /**

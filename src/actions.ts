@@ -12,12 +12,12 @@ export enum TriggerState {
     /** The action was previously {@link TriggerState.None} and just started. */
     Started = 1 << 0,
 
-    /** The action was previously {@link TriggerState.Started}, but isn't yet completed. */
+    /** The action was previously {@link TriggerState.Started}, but isn't yet done. */
     Ongoing = 1 << 1,
 
     /**
      * The action was {@link TriggerState.Started} or {@link TriggerState.Ongoing},
-     * but was just canceled.
+     * and was just canceled.
      */
     Canceled = 1 << 2,
 
@@ -73,24 +73,26 @@ export class Action {
     /**
      * Event triggered when the interaction is ongoing.
      *
-     * This event might be notified every frame until the interaction is cancelled
+     * This event might fire every frame until the interaction is canceled
      * or succeeded.
      *
-     * Example of triggers that will emit this event: {@link LongPressTrigger}.
+     * Example of triggers that will emit this event: {@link ReleaseTrigger}
+     * or {@link LongPressTrigger}.
      */
     readonly ongoing = new Emitter<[Action]>();
 
     /**
-     * Event triggered when the interaction is cancelled.
+     * Event triggered when the interaction is canceled.
      *
-     * Example of triggers that will emit this event: {@link LongPressTrigger}.
+     * Example of triggers that will emit this event: {@link ReleaseTrigger}
+     * or {@link LongPressTrigger}.
      */
     readonly canceled = new Emitter<[Action]>();
 
     /**
      * Event triggered when the interaction is completed.
      *
-     * All triggers will complete upon successfull interaction.
+     * All triggers will complete upon successful interaction.
      */
     readonly completed = new Emitter<[Action]>();
 
@@ -100,12 +102,17 @@ export class Action {
     /** State the action is currently in. @hidden */
     readonly _state = TriggerState.None;
 
-    /** Trigger that last modified this action's state. @hidden */
+    /** Last trigger that modified this action's state. @hidden */
     readonly _trigger: Trigger | null = null;
 
     /** Identifier for this action. @hidden */
     private readonly _id: string;
 
+    /**
+     * Create a new action.
+     *
+     * @param id The action's identifier.
+     */
     constructor(id: string) {
         this._id = id;
     }
@@ -120,17 +127,17 @@ export class Action {
         return 0.0;
     }
 
-    /** {@link TriggerState} in which the action is currently in. */
+    /** State in which the action is currently in. */
     get state() {
         return this._state;
     }
 
-    /** {@link Trigger} that last modified this action's state. */
+    /** Trigger that last modified this action's state. */
     get trigger() {
         return this._trigger;
     }
 
-    /** The last device that activated this action. */
+    /** Device that last modified this action's value. */
     get device() {
         return this._device;
     }
@@ -153,10 +160,11 @@ export class Action {
 /**
  * Action storing a boolean value.
  *
- * Use boolean actions for on / off actions, such as jumping,
+ * Use boolean actions for on or off events, such as jumping,
  * activating elements, etc...
  */
 export class BooleanAction extends Action {
+    /** Action's value. */
     value = false;
 
     /**
@@ -176,8 +184,11 @@ export class BooleanAction extends Action {
 
 /**
  * Action storing an 2d axis value.
+ *
+ * Use axis actions for values such as move direction, etc...
  */
 export class Axis2dAction extends Action {
+    /** Action's value. */
     value = new Float32Array(2);
 
     /**

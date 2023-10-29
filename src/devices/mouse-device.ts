@@ -1,7 +1,7 @@
 import {Emitter} from '../utils/event.js';
 import {Device, isAxisNonZero} from './device.js';
 
-/** Binding for mouse button. */
+/** Binding for mouse buttons. */
 export enum MouseBinding {
     /** Left mouse button. */
     Primary = 1,
@@ -74,7 +74,7 @@ export class MouseDevice extends Device {
         });
     }
 
-    /** Disable the mouse listeners */
+    /** Disable the mouse listeners. */
     disable() {
         const element = this.#element as HTMLElement;
         element.removeEventListener('pointerdown', this.#onMousePress);

@@ -2,7 +2,7 @@ import {Emitter} from '../utils/event.js';
 import {Device} from './device.js';
 
 /**
- * Binding for keyboard button.
+ * Binding for keyboard buttons.
  *
  * @note Each key maps to a value (with an offset of `1`) in the table:
  * https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_code_values#code_values_on_mac
@@ -164,9 +164,9 @@ export class KeyboardDevice extends Device {
 
     /* Listeners */
 
-    /** Emitter for press event. @hidden */
+    /** Emitter for press events. @hidden */
     #onPress = new Emitter<[KeyboardEvent]>();
-    /** Emitter for release event. @hidden */
+    /** Emitter for release events. @hidden */
     #onRelease = new Emitter<[KeyboardEvent]>();
 
     /** Triggered upon key press. @hidden */

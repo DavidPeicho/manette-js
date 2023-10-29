@@ -27,18 +27,18 @@ export enum XRAxisBinding {
  * ## Usage
  *
  * ```js
- * const left = new XRGamepadInput('left', Handedness.Left);
- * const right = new XRGamepadInput('right', Handedness.Right);
+ * const left = new XRDevice('left', Handedness.Left);
+ * const right = new XRDevice('right', Handedness.Right);
  *
  * // Gamepads must be updated every frame, before running
  * // the action manager update.
  * left.update();
  * right.update();
  *
- * // Checks whether the trigger button is pressed on the left gamepad.
+ * // Checks whether a trigger button is pressed on the left gamepad.
  * console.log(left.pressed(XRButtonBinding.Trigger));
  *
- * // Checks whether the trigger button is pressed on the right gamepad.
+ * // Checks whether a trigger button is pressed on the right gamepad.
  * console.log(right.pressed(XRButtonBinding.Trigger));
  * ```
  */
@@ -58,6 +58,12 @@ export class XRDevice extends Device {
     /** Bitset for touched buttons. @hidden */
     #touched = 0;
 
+    /**
+     * Crete a new XR device.
+     *
+     * @param id Unique identifier.
+     * @param handedness This device handedness.
+     */
     constructor(id: string, handedness: Handedness) {
         super(id);
         this.#handedness = handedness;
@@ -137,7 +143,7 @@ export class XRDevice extends Device {
         this.#xrInputSource = null;
     }
 
-    /** Get this source handedness. */
+    /** Get this device handedness. */
     get handedness(): Handedness {
         return this.#handedness;
     }
