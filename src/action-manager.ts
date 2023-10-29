@@ -87,37 +87,20 @@ export class ActionManager {
                 }
             }
 
-            if (!match || match.trigger !== action.trigger) {
-                if (action.running) {
-                    (action._state as TriggerState) = TriggerState.Canceled;
-                    action.canceled.notify(action);
-                } else {
-                    (action._state as TriggerState) = TriggerState.None;
-                }
-                action.trigger?.reset();
+            const newTrigger = match?.trigger ?? null;
+            if (action.trigger && newTrigger !== action.trigger) {
+                /* Notify the action about the previous trigger being aborted. */
+                this._notify(action, action.trigger.update(action, dt));
             }
-            if (!match) continue;
 
-            (action._source as InputSource) = match.source;
-            if (match.trigger) {
-                (action._state as TriggerState) = match.trigger.update(action, dt);
-                (action._trigger as Trigger) = match.trigger;
+            (action._source as null) = null;
+            (action._trigger as null) = null;
+            if (match) {
+                (action._source as InputSource) = match.source;
             }
-            switch (action.state) {
-                case TriggerState.Started:
-                    action.started.notify(action);
-                    break;
-                case TriggerState.Ongoing:
-                    action.ongoing.notify(action);
-                    break;
-                case TriggerState.Canceled:
-                    action.canceled.notify(action);
-                    break;
-                case TriggerState.Completed:
-                    action.completed.notify(action);
-                    break;
-                default:
-                    break;
+            if (newTrigger) {
+                (action._trigger as Trigger) = newTrigger;
+                this._notify(action, newTrigger.update(action, dt) ?? TriggerState.None);
             }
         }
     }
@@ -174,5 +157,41 @@ export class ActionManager {
         const id = target instanceof Action ? target.id : target;
         const index = this._actions.findIndex((action) => action.id === id);
         return index >= 0 ? index : null;
+    }
+
+    private _notify(action: Action, nextState: TriggerState) {
+        const previousState = action.state;
+        (action._state as TriggerState) = nextState;
+
+        switch (nextState) {
+            case TriggerState.None:
+                if (
+                    previousState === TriggerState.Started ||
+                    previousState === TriggerState.Ongoing
+                ) {
+                    action.canceled.notify(action);
+                }
+                break;
+            case TriggerState.Started:
+                action.started.notify(action);
+                break;
+            case TriggerState.Ongoing:
+                if (previousState === TriggerState.None) {
+                    action.started.notify(action);
+                }
+                action.ongoing.notify(action);
+                break;
+            case TriggerState.Completed:
+                if (previousState === TriggerState.None) {
+                    action.started.notify(action);
+                }
+                action.completed.notify(action);
+                break;
+            case TriggerState.Canceled:
+                action.canceled.notify(action);
+                break;
+            default:
+                break;
+        }
     }
 }

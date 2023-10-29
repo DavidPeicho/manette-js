@@ -160,7 +160,7 @@ export class KeyboardInputSource extends InputSource {
     #bitset: Int32Array = new Int32Array(4);
 
     /** HTML elements for event listeners. @hidden */
-    #element: HTMLElement | Window = window;
+    #element: HTMLElement | Document = null!;
 
     /* Listeners */
 
@@ -189,8 +189,8 @@ export class KeyboardInputSource extends InputSource {
      *
      * @param element The element to register on.
      */
-    enable(element: HTMLElement | Window = window) {
-        this.#element = element as HTMLElement;
+    enable(element?: HTMLElement | Document) {
+        this.#element = (element ?? document) as HTMLElement;
         this.#element.addEventListener('keydown', this.#onKeyPress);
         this.#element.addEventListener('keyup', this.#onKeyRelease);
     }
@@ -200,7 +200,7 @@ export class KeyboardInputSource extends InputSource {
         const elt = this.#element as HTMLElement;
         elt.removeEventListener('keydown', this.#onKeyPress);
         elt.removeEventListener('keyup', this.#onKeyRelease);
-        this.#element = window;
+        this.#element = document;
     }
 
     /** @inheritdoc */
