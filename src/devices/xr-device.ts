@@ -94,8 +94,8 @@ export class XRDevice extends Device {
         this.#touched = 0;
         for (let i = 0; i < buttons.length; ++i) {
             const button = buttons[i];
-            this.#pressed &= button.pressed ? 1 << i : ~0;
-            this.#touched &= button.touched ? 1 << i : ~0;
+            if (button.pressed) this.#pressed |= 1 << i;
+            if (button.touched) this.#touched |= 1 << i;
         }
     }
 

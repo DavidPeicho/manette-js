@@ -69,9 +69,9 @@ export class ActionManager {
     }
 
     /**
-     * Compute
+     * Update the actions state and trigger events.
      *
-     * @param dt
+     * @param dt Elapsed time since the last call to `update`, **in seconds**.
      */
     update(dt: number) {
         for (let i = 0; i < this._actions.length; ++i) {
@@ -153,6 +153,12 @@ export class ActionManager {
         return index >= 0 ? index : null;
     }
 
+    /**
+     * Notify the action events and update the action's state.
+     *
+     * @param action The action to process.
+     * @param nextState The next state to assign to the action.
+     */
     private _notify(action: Action, nextState: TriggerState) {
         const previousState = action.state;
         (action._state as TriggerState) = nextState;

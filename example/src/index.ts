@@ -15,6 +15,7 @@ import {
     LongPressTrigger,
     MouseBinding,
     MouseDevice,
+    PressTrigger,
 } from 'haptic-js';
 
 import {Game} from './game.js';
@@ -103,8 +104,8 @@ for (const action of [fire, move, reset]) {
 
 const manager = new ActionManager();
 manager.add(fire, [
-    new BooleanMapping(mouse, MouseBinding.Primary),
-    new BooleanMapping(keyboard, KeyboardBinding.Enter),
+    new BooleanMapping(mouse, MouseBinding.Primary).setTrigger(new PressTrigger()),
+    new BooleanMapping(keyboard, KeyboardBinding.Enter).setTrigger(new PressTrigger()),
 ]);
 manager.add(move, [
     new EmulatedAxis2dMapping(keyboard, {

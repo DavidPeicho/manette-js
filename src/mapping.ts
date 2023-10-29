@@ -160,7 +160,6 @@ export class BooleanMapping extends Mapping {
     constructor(device: Device, ...buttons: number[]) {
         super(device);
         this.setButtons(...buttons);
-        this.trigger = new PressTrigger();
     }
 
     /**
