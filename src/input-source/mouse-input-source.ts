@@ -37,7 +37,7 @@ export class MouseInputSource extends InputSource {
     #mouseNDC = new Float32Array(2);
 
     /** HTML element for pointer event listeners. @hidden */
-    #element: HTMLElement | Document = document;
+    #element: HTMLElement | Document = null!;
 
     /** Triggered on mouse press. @hidden */
     #onMousePress = this._onMousePress.bind(this);
@@ -58,8 +58,8 @@ export class MouseInputSource extends InputSource {
      *
      * @param element The element to register on.
      */
-    enable(element: HTMLElement | Document = document) {
-        this.#element = element as HTMLElement;
+    enable(element?: HTMLElement | Document) {
+        this.#element = (element ?? document) as HTMLElement;
         this.#element.addEventListener('pointerdown', this.#onMousePress);
         this.#element.addEventListener('pointerup', this.#onMouseRelease);
         this.#element.addEventListener('pointermove', this.#onMouseMove);
