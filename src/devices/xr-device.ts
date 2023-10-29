@@ -11,8 +11,8 @@ export enum XRButtonBinding {
     Trigger = 1,
     Grip = 2,
     Joystick = 3,
-    PrimaryButton = 4,
-    SecondaryButton = 5,
+    PrimaryButton = 5,
+    SecondaryButton = 6,
 }
 
 /** Binding for XR axis buttons. */
