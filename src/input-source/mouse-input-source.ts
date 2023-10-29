@@ -1,5 +1,5 @@
 import {Emitter} from '../utils/event.js';
-import {InputSource} from './input.js';
+import {InputSource, isAxisNonZero} from './input.js';
 
 /** Binding for mouse button. */
 export enum MouseBinding {
@@ -11,6 +11,11 @@ export enum MouseBinding {
     Auxiliary = 3,
     Fourth = 4,
     Fifth = 5,
+}
+
+/** Binding for mouse axis buttons. */
+export enum MouseAxisBinding {
+    NormalizedPosition = 1,
 }
 
 /**
@@ -37,7 +42,7 @@ export class MouseInputSource extends InputSource {
     #mouseNDC = new Float32Array(2);
 
     /** HTML element for pointer event listeners. @hidden */
-    #element: HTMLElement | Document = null!;
+    #element: HTMLElement = null!;
 
     /** Triggered on mouse press. @hidden */
     #onMousePress = this._onMousePress.bind(this);
@@ -59,7 +64,7 @@ export class MouseInputSource extends InputSource {
      * @param element The element to register on.
      */
     enable(element?: HTMLElement | Document) {
-        this.#element = (element ?? document) as HTMLElement;
+        this.#element = (element ?? document.body) as HTMLElement;
         this.#element.addEventListener('pointerdown', this.#onMousePress);
         this.#element.addEventListener('pointerup', this.#onMouseRelease);
         this.#element.addEventListener('pointermove', this.#onMouseMove);
@@ -81,6 +86,17 @@ export class MouseInputSource extends InputSource {
     pressed(button: MouseBinding): boolean {
         const value = button - 1;
         return !!(this.#buttons & (1 << value));
+    }
+
+    /** @inheritdoc */
+    axis2d(out: Float32Array, button: MouseAxisBinding): boolean {
+        switch (button) {
+            case MouseAxisBinding.NormalizedPosition:
+                out[0] = this.#mouseNDC[0];
+                out[1] = this.#mouseNDC[1];
+                break;
+        }
+        return isAxisNonZero(out);
     }
 
     /** Mouse coordinates, in the range [-1; 1]. */
@@ -128,13 +144,13 @@ export class MouseInputSource extends InputSource {
     /** Process mouse move events. @hidden */
     private _onMouseMove(e: PointerEvent) {
         const elt = this.#element as HTMLElement;
-        const width = elt.clientWidth;
-        const height = elt.clientHeight;
+        const rect = elt.getBoundingClientRect();
+
         this.#mouseAbsolute[0] = e.clientX;
         this.#mouseAbsolute[1] = e.clientY;
 
-        this.#mouseNDC[0] = (e.clientX / width) * 2.0 - 1.0;
-        this.#mouseNDC[1] = (e.clientY / height) * 2.0 - 1.0;
+        this.#mouseNDC[0] = (e.clientX / rect.width) * 2.0 - 1.0;
+        this.#mouseNDC[1] = (e.clientY / rect.height) * 2.0 - 1.0;
     }
 
     /** Process mouse press events. @hidden */

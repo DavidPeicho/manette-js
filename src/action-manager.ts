@@ -93,15 +93,9 @@ export class ActionManager {
                 this._notify(action, action.trigger.update(action, dt));
             }
 
-            (action._source as null) = null;
-            (action._trigger as null) = null;
-            if (match) {
-                (action._source as InputSource) = match.source;
-            }
-            if (newTrigger) {
-                (action._trigger as Trigger) = newTrigger;
-                this._notify(action, newTrigger.update(action, dt) ?? TriggerState.None);
-            }
+            (action._trigger as Trigger | null) = newTrigger;
+            (action._source as InputSource | null) = match?.source ?? null;
+            this._notify(action, newTrigger?.update(action, dt) ?? TriggerState.None);
         }
     }
 

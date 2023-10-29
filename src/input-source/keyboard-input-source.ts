@@ -190,7 +190,7 @@ export class KeyboardInputSource extends InputSource {
      * @param element The element to register on.
      */
     enable(element?: HTMLElement | Document) {
-        this.#element = (element ?? document) as HTMLElement;
+        this.#element = (element ?? document.body) as HTMLElement;
         this.#element.addEventListener('keydown', this.#onKeyPress);
         this.#element.addEventListener('keyup', this.#onKeyRelease);
     }
