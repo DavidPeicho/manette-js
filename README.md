@@ -4,6 +4,8 @@ Input & action mapping library for JavaScript.
 
 > 🚧 haptic-js is released as a beta until the API is stabilized 🚧
 
+![](./img/example.png)
+
 **Features**:
 
 * Supported devices:
@@ -17,8 +19,8 @@ Input & action mapping library for JavaScript.
 
 Getting started:
 
-* [Documentation](./DOC.md)
-* [Example](./example/src/index.ts)
+* [Example Demo](https://davidpeicho.github.io/haptic-js/)
+* [Example Source](./example/src/index.ts)
 
 ## Install
 
@@ -54,7 +56,7 @@ const fire = new BooleanAction();
 // Player performs a move action (forward / backward / left / right).
 const move = new Axis2dAction();
 
-// Create devices: One mouse and two gamepads (one per controller).
+// Create devices: One mouse, one keyboard, and two gamepads (one per controller).
 const mouse = new MouseDevice('mouse');
 const keyboard = new MouseDevice('keyboard');
 const rightGamepad = new XRDevice('right', Handedness.Right);
@@ -80,24 +82,19 @@ manager.add(move, [
     new Axis2dMapping(leftGamepad, XRAxisBinding.Joystick)
 ]);
 
-// This event is triggered when a match for any of the mapping occurs.
 fire.completed.add(() => console.log('Pew!'));
 
 let previousTime = performance.now();
 function animate() {
     const dt = performance.now() - previousTime;
+    // XR controllers need to be updated once per frame,
+    // at the opposite of the keyboard and mouse ones.
     rightGamepad.update(dt);
     leftGamepad.update(dt);
     window.requestAnimationFrame(animate);
 }
 animate();
 ```
-
-## Example
-
-![](./img/example.png)
-
-The repository comes with a small [example](example) demonstrating how to use the library.
 
 ## ToDo
 
