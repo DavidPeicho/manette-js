@@ -1,6 +1,6 @@
 # manette-js
 
-Input & action mapping library for JavaScript.
+Manette (\\ma.nɛt\\) is an action mapping library for JavaScript.
 
 > 🚧 manette-js is released as a beta until the API is stabilized 🚧
 
