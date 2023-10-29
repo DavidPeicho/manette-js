@@ -59,7 +59,7 @@ export class Trigger {
      */
     update(action: Action, dt: number): TriggerState {
         this._actuated = this.actuated(action);
-        const state = this._nextState(action, dt);
+        const state = this._nextState(dt, action);
         this._wasActuated = this._actuated;
         return state;
     }
@@ -87,17 +87,13 @@ export class Trigger {
     }
 
     /**
-     * Reset the state of the trigger.
+     * Next state implementation.
      *
-     * This is called automatically by the {@link ActionManager} if:
-     * * The action isn't activated by any mapping
-     * * A different trigger got priority over this action
+     * @param dt Elapsed time since the last call to `update`, **in seconds**.
+     * @param action The action to run through the trigger.
+     * @returns The new state the action is in.
      */
-    reset(): void {
-        this._wasActuated = false;
-    }
-
-    protected _nextState(action: Action, dt: number): TriggerState {
+    protected _nextState(dt: number, action: Action): TriggerState {
         return TriggerState.None;
     }
 }
@@ -163,7 +159,9 @@ export class LongPressTrigger extends Trigger {
     duration: number;
 
     /** Current elapsed time, **in seconds**. @hidden */
-    private _timer: number = Number.POSITIVE_INFINITY;
+    private _timer: number = 0.0;
+
+    private _triggered = false;
 
     /**
      * Create a new long press trigger.
@@ -176,22 +174,21 @@ export class LongPressTrigger extends Trigger {
     }
 
     /** @inheritdoc */
-    override _nextState(action: Action, dt: number) {
-        const wasAccuated = this._wasActuated;
-        const accuated = action.magnitudeSq() >= this.actuationSq;
-        this._wasActuated = accuated;
-
-        if (this._actuated) {
-            this._timer -= dt;
-            return this._timer > 0.0 ? TriggerState.Ongoing : TriggerState.Completed;
+    override _nextState(dt: number) {
+        console.log(this._timer);
+        if (!this._actuated) {
+            this._timer = 0.0;
+            return TriggerState.None;
         }
-
-        return this._wasActuated ? TriggerState.Canceled : TriggerState.None;
-    }
-
-    /** @inheritdoc */
-    reset(): void {
-        super.reset();
-        this._timer = Number.POSITIVE_INFINITY;
+        this._timer += dt;
+        if (this._timer < this.duration) {
+            this._triggered = false;
+            return TriggerState.Ongoing;
+        }
+        if (!this._triggered) {
+            this._triggered = true;
+            return TriggerState.Completed;
+        }
+        return TriggerState.None;
     }
 }

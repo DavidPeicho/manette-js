@@ -92,8 +92,16 @@ export class ActionManager {
                 /* Notify the action about the previous trigger being aborted. */
                 this._notify(action, action.trigger.update(action, dt));
             }
-            (action._trigger as Trigger | null) = newTrigger;
-            this._notify(action, newTrigger?.update(action, dt) ?? TriggerState.None);
+
+            (action._source as null) = null;
+            (action._trigger as null) = null;
+            if (match) {
+                (action._source as InputSource) = match.source;
+            }
+            if (newTrigger) {
+                (action._trigger as Trigger) = newTrigger;
+                this._notify(action, newTrigger.update(action, dt) ?? TriggerState.None);
+            }
         }
     }
 
