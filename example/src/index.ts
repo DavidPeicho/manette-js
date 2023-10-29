@@ -1,5 +1,7 @@
 import './style.css';
+// @ts-ignore
 import keyboardSVG from '/keyboard.svg?raw';
+// @ts-ignore
 import mouseSVG from '/mouse.svg?raw';
 
 import {
