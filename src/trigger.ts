@@ -44,6 +44,12 @@ export class Trigger {
      */
     actuationSq = 0.5;
 
+    /** `true` if the action is activated at this frame. @hidden */
+    protected _actuated = false;
+
+    /** `true` if the action was activated at the previous frame. @hidden */
+    protected _wasActuated = false;
+
     /**
      * Run the trigger over a given action to compute its next state.
      *
@@ -52,7 +58,10 @@ export class Trigger {
      * @returns The new state the action is in.
      */
     update(action: Action, dt: number): TriggerState {
-        return TriggerState.None;
+        this._actuated = this.actuated(action);
+        const state = this._nextState(action, dt);
+        this._wasActuated = this._actuated;
+        return state;
     }
 
     /**
@@ -73,6 +82,10 @@ export class Trigger {
         return this;
     }
 
+    actuated(action: Action): boolean {
+        return action.magnitudeSq() >= this.actuationSq;
+    }
+
     /**
      * Reset the state of the trigger.
      *
@@ -80,35 +93,12 @@ export class Trigger {
      * * The action isn't activated by any mapping
      * * A different trigger got priority over this action
      */
-    reset(): void {}
-}
-
-/**
- * Set the action's state to {@link TriggerState.Completed} after
- * an initial press.
- *
- * At the opposite of {@link DownTrigger}, this trigger will notify the
- * {@link Action.completed} event only once. The button will need to be
- */
-export class PressTrigger extends Trigger {
-    /** `true` if the action was activated at the previous frame. @hidden */
-    private _wasPressed = false;
-
-    /** @inheritdoc */
-    update(action: Action) {
-        const value = action.magnitudeSq();
-        const accuated = value >= this.actuationSq;
-        if (accuated && !this._wasPressed) {
-            this._wasPressed = true;
-            return TriggerState.Completed;
-        }
-        this._wasPressed = accuated;
-        return TriggerState.None;
+    reset(): void {
+        this._wasActuated = false;
     }
 
-    /** @inheritdoc */
-    reset() {
-        this._wasPressed = false;
+    protected _nextState(action: Action, dt: number): TriggerState {
+        return TriggerState.None;
     }
 }
 
@@ -120,9 +110,44 @@ export class PressTrigger extends Trigger {
  */
 export class DownTrigger extends Trigger {
     /** @inheritdoc */
-    update(action: Action) {
-        const value = action.magnitudeSq();
-        return value >= this.actuationSq ? TriggerState.Completed : TriggerState.None;
+    override _nextState() {
+        return this._actuated ? TriggerState.Completed : TriggerState.None;
+    }
+}
+
+/**
+ * Set the action's state to {@link TriggerState.Completed} after
+ * an initial press.
+ *
+ * At the opposite of {@link DownTrigger}, this trigger will notify the
+ * {@link Action.completed} event only once. The button will need to be
+ */
+export class PressTrigger extends Trigger {
+    /** @inheritdoc */
+    override _nextState() {
+        return this._actuated && !this._wasActuated
+            ? TriggerState.Completed
+            : TriggerState.None;
+    }
+}
+
+/**
+ * Set the action's state to {@link TriggerState.Completed} after
+ * an the binding is released.
+ *
+ * At the opposite of {@link ReleaseTrigger}, this trigger will notify the
+ * {@link Action.completed} event only once. The button will need to be
+ */
+export class ReleaseTrigger extends Trigger {
+    /** @inheritdoc */
+    override _nextState() {
+        if (this._actuated) {
+            return TriggerState.Ongoing;
+        }
+        if (this._wasActuated) {
+            return TriggerState.Completed;
+        }
+        return TriggerState.None;
     }
 }
 
@@ -136,9 +161,6 @@ export class LongPressTrigger extends Trigger {
      * is {@link TriggerState.Completed}.
      */
     duration: number;
-
-    /** `true` if the action was actuated at the previous frame. @hidden */
-    private _wasActuated = false;
 
     /** Current elapsed time, **in seconds**. @hidden */
     private _timer: number = Number.POSITIVE_INFINITY;
@@ -154,30 +176,22 @@ export class LongPressTrigger extends Trigger {
     }
 
     /** @inheritdoc */
-    update(action: Action, dt: number) {
+    override _nextState(action: Action, dt: number) {
         const wasAccuated = this._wasActuated;
         const accuated = action.magnitudeSq() >= this.actuationSq;
         this._wasActuated = accuated;
 
-        if (!accuated) {
-            return action.running ? TriggerState.Canceled : TriggerState.None;
-        }
-
-        if (action.state === TriggerState.None && !wasAccuated) {
-            this._timer = this.duration;
-            return TriggerState.Started;
-        }
-        if (action.running) {
+        if (this._actuated) {
             this._timer -= dt;
             return this._timer > 0.0 ? TriggerState.Ongoing : TriggerState.Completed;
         }
 
-        return TriggerState.None;
+        return this._wasActuated ? TriggerState.Canceled : TriggerState.None;
     }
 
     /** @inheritdoc */
     reset(): void {
-        this._wasActuated = false;
+        super.reset();
         this._timer = Number.POSITIVE_INFINITY;
     }
 }

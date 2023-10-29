@@ -217,6 +217,18 @@ export class Axis2dMapping extends Mapping {
     button = 0;
 
     /**
+     * Create a new boolean mapping.
+     *
+     * @param source The input source checked by this mapping.
+     * @param button The axis button binding. This can be later specified
+     *     using {@link BooleanMapping.button} or {@link BooleanMapping.setButton}.
+     */
+    constructor(source: InputSource, button: number = 0) {
+        super(source);
+        this.button = button;
+    }
+
+    /**
      * Set the axis button binding.
      *
      * Each source has its own enumeration for axis binding. For instance,
@@ -238,7 +250,7 @@ export class Axis2dMapping extends Mapping {
     /** @inheritdoc */
     validate(action: Action): void {
         const value = (action as Axis2dAction).value;
-        if (!Array.isArray(value)) {
+        if (!value.length) {
             throw new Error(
                 'Axis2dMapping can only be used with axis2d actions.\n' +
                     `\tAction '${action.id}' has a non-array value.`
