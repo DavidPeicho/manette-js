@@ -1,5 +1,5 @@
 import {Action, TriggerState} from './actions.js';
-import {InputSource} from './input-source/input.js';
+import {Device} from './devices/device.js';
 import {Mapping} from './mapping.js';
 import {Trigger} from './trigger.js';
 
@@ -17,12 +17,12 @@ import {Trigger} from './trigger.js';
  *
  * const manager = new ActionManager();
  * manager.add(fire, [
- *     new BooleanMapping(mouseInput, MouseBinding.Primary),
- *     new BooleanMapping(keyboardInput, KeyboardBinding.Enter),
+ *     new BooleanMapping(mouse, MouseBinding.Primary),
+ *     new BooleanMapping(keyboard, KeyboardBinding.Enter),
  * ]);
  * manager.add(move, [
  *     // WASD to [-1; 1]
- *     new EmulatedAxis2dMapping(keyboardInput, {
+ *     new EmulatedAxis2dMapping(keyboard, {
  *         maxY: KeyboardBinding.KeyW,
  *         minX: KeyboardBinding.KeyA,
  *         minY: KeyboardBinding.KeyS,
@@ -94,7 +94,7 @@ export class ActionManager {
             }
 
             (action._trigger as Trigger | null) = newTrigger;
-            (action._source as InputSource | null) = match?.source ?? null;
+            (action._device as Device | null) = match?.device ?? null;
             this._notify(action, newTrigger?.update(action, dt) ?? TriggerState.None);
         }
     }

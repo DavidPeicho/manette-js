@@ -1,11 +1,11 @@
 import {EPSILON} from '../constants.js';
 
 /**
- * Base class for any input source, such as keyboard, mouse,
+ * Base class for any device, such as keyboard, mouse,
  * or gamepad.
  */
-export class InputSource {
-    /** Identifier of the source. @hidden */
+export class Device {
+    /** Identifier of the device. @hidden */
     #id: string;
 
     constructor(id: string) {
@@ -15,7 +15,7 @@ export class InputSource {
     /**
      * Check whether buttons are simultaneously pressed.
      *
-     * @note This method relies on {@link InputSource.pressed}.
+     * @note This method relies on {@link Device.pressed}.
      *
      * @param buttons Buttons id to check.
      * @returns `true` if the buttons are pressed, `false` otherwise.
@@ -60,7 +60,7 @@ export class InputSource {
     }
 
     /**
-     * Validate that the given button id exists in this source.
+     * Validate that the given button id exists in this device.
      *
      * @note This method throws if the button doesn't exist.
      *
@@ -69,7 +69,7 @@ export class InputSource {
     validateButton(button: number) {}
 
     /**
-     * Validate that the given button axis button exists in this source.
+     * Validate that the given button axis button exists in this device.
      *
      * @note This method throws if the button doesn't exist.
      *
@@ -77,7 +77,7 @@ export class InputSource {
      */
     validateAxis(button: number) {}
 
-    /** Identifier for this input source. */
+    /** Identifier for this device. */
     get id() {
         return this.#id;
     }

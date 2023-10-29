@@ -1,5 +1,5 @@
 import {Emitter} from '../utils/event.js';
-import {InputSource} from './input.js';
+import {Device} from './device.js';
 
 /**
  * Binding for keyboard button.
@@ -143,19 +143,19 @@ function toBit32(bit128: number) {
 }
 
 /**
- * Keyboard input source.
+ * Keyboard device.
  *
  * ## Usage
  *
  * ```js
- * const keyboard = new KeyboardInputSource('keyboard');
+ * const keyboard = new KeyboardDevice('keyboard');
  * enable(document.body); // Registers listeners.
  *
  * // Checks whether the space bar button is pressed or not.
  * console.log(keyboard.pressed(KeyboardBinding.Space));
  * ```
  */
-export class KeyboardInputSource extends InputSource {
+export class KeyboardDevice extends Device {
     /** Bitset for pressed buttons. @hidden */
     #bitset: Int32Array = new Int32Array(4);
 
@@ -213,7 +213,7 @@ export class KeyboardInputSource extends InputSource {
     validateButton(button: number) {
         if (KeyboardBinding[button] === undefined) {
             throw new Error(
-                `Input source '${this.id}' used with an invalid button.\n` +
+                `Device '${this.id}' used with an invalid button.\n` +
                     `\tButton '${button}' doesn't exist on KeyboardBinding'`
             );
         }
@@ -225,7 +225,7 @@ export class KeyboardInputSource extends InputSource {
      * ## Usage
      *
      * ```js
-     * const keyboard = new KeyboardInputSource('keyboard');
+     * const keyboard = new KeyboardDevice('keyboard');
      * keyboard.onPress.add((e) => {
      *     console.log('Raw press event: ', e);
      * });
@@ -241,7 +241,7 @@ export class KeyboardInputSource extends InputSource {
      * ## Usage
      *
      * ```js
-     * const keyboard = new KeyboardInputSource('keyboard');
+     * const keyboard = new KeyboardDevice('keyboard');
      * keyboard.onRelease.add((e) => {
      *     console.log('Raw release event: ', e);
      * });

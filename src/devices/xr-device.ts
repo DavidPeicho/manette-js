@@ -1,4 +1,4 @@
-import {InputSource, isAxisNonZero} from './input.js';
+import {Device, isAxisNonZero} from './device.js';
 
 /** XR Handedness. */
 export enum Handedness {
@@ -22,7 +22,7 @@ export enum XRAxisBinding {
 }
 
 /**
- * XR gamepad input source.
+ * XR gamepad device.
  *
  * ## Usage
  *
@@ -42,11 +42,11 @@ export enum XRAxisBinding {
  * console.log(right.pressed(XRButtonBinding.Trigger));
  * ```
  */
-export class XRGamepadInputSource extends InputSource {
+export class XRDevice extends Device {
     /** XR input source. @hidden */
     #xrInputSource: XRInputSource | null = null;
 
-    /** This source handedness. @hidden */
+    /** This device handedness. @hidden */
     #handedness: Handedness;
 
     /** Handedness stored as a string. @hidden */
@@ -118,7 +118,7 @@ export class XRGamepadInputSource extends InputSource {
     }
 
     /**
-     * Enable this input source.
+     * Enable this device.
      *
      * @param session The XR session.
      */
@@ -132,7 +132,7 @@ export class XRGamepadInputSource extends InputSource {
         }
     }
 
-    /** Disable this input source. */
+    /** Disable this device. */
     disable() {
         this.#xrInputSource = null;
     }

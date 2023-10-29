@@ -1,5 +1,5 @@
 import {Emitter} from '../utils/event.js';
-import {InputSource, isAxisNonZero} from './input.js';
+import {Device, isAxisNonZero} from './device.js';
 
 /** Binding for mouse button. */
 export enum MouseBinding {
@@ -19,19 +19,19 @@ export enum MouseAxisBinding {
 }
 
 /**
- * Mouse input source.
+ * Mouse device.
  *
  * ## Usage
  *
  * ```js
- * const mouse = new MouseInputSource('mouse');
+ * const mouse = new MouseDevice('mouse');
  * enable(document.body); // Registers listeners.
  *
  * // Checks whether the left button is pressed or not.
  * console.log(mouse.pressed(MouseBinding.Primary));
  * ```
  */
-export class MouseInputSource extends InputSource {
+export class MouseDevice extends Device {
     /** Bitset for pressed buttons. @hidden */
     #buttons: number = 0;
 
@@ -115,7 +115,7 @@ export class MouseInputSource extends InputSource {
      * ## Usage
      *
      * ```js
-     * const mouse = new MouseInputSource();
+     * const mouse = new MouseDevice();
      * mouse.onPress.add((e) => {
      *     console.log('Raw press event: ', e);
      * });
@@ -131,7 +131,7 @@ export class MouseInputSource extends InputSource {
      * ## Usage
      *
      * ```js
-     * const mouse = new MouseInputSource();
+     * const mouse = new MouseDevice();
      * mouse.onRelease.add((e) => {
      *     console.log('Raw release event: ', e);
      * });

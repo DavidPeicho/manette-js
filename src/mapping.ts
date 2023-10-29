@@ -1,20 +1,20 @@
-import {Action, Axis2dAction, BooleanAction} from './actions.js';
 import {EPSILON} from './constants.js';
-import {InputSource, isAxisNonZero} from './input-source/input.js';
+import {Action, Axis2dAction, BooleanAction} from './actions.js';
+import {Device, isAxisNonZero} from './devices/device.js';
 import {PressTrigger, Trigger} from './trigger.js';
 
 /**
  * A mapping is used to activate an action based on an interaction from
- * a selected {@link InputSource}.
+ * a selected {@link Device}.
  *
- * The mapping thus links an {@link InputSource} and a {@link Trigger} to an {@link Action}.
+ * The mapping thus links an {@link Device} and a {@link Trigger} to an {@link Action}.
  *
  * The different types of mapping are used to assign the action a value upon match:
- * * {@link BooleanMapping}: Maps a boolean button from an input source
+ * * {@link BooleanMapping}: Maps a boolean button from a device
  *   to a {@link BooleanAction}
- * * {@link Axis2dMapping}: Maps an axis button from an input source
+ * * {@link Axis2dMapping}: Maps an axis button from a device
  *   to an {@link Axis2dAction}
- * * {@link EmulatedAxis2dMapping}: Emulates multiple buttons from an input source
+ * * {@link EmulatedAxis2dMapping}: Emulates multiple buttons from a device
  *   as an axis for the {@link Axis2dAction}
  * * etc...
  *
@@ -55,8 +55,8 @@ import {PressTrigger, Trigger} from './trigger.js';
  * For more information about trigger, have a look at the {@link Trigger} documentation.
  */
 export class Mapping {
-    /** {@link InputSource} to read from. */
-    source: InputSource;
+    /** {@link Device} to read from. */
+    device: Device;
 
     /** Optional trigger modifyinh the action's state. */
     trigger: Trigger | null = null;
@@ -64,10 +64,10 @@ export class Mapping {
     /**
      * Create a new mapping.
      *
-     * @param source The input source checked by this mapping.
+     * @param device The device checked by this mapping.
      */
-    constructor(source: InputSource) {
-        this.source = source;
+    constructor(device: Device) {
+        this.device = device;
     }
 
     /**
@@ -102,9 +102,9 @@ export class Mapping {
     validate(action: Action): void {}
 
     /**
-     * Validate buttons, i.e., ensure they belong to the source.
+     * Validate buttons, i.e., ensure they belong to the device.
      *
-     * @note This method **throws** if any button isn't compatible with the source.
+     * @note This method **throws** if any button isn't compatible with the device.
      *
      * @param name Name to display upon error.
      * @param buttons Buttons to validate.
@@ -115,7 +115,7 @@ export class Mapping {
         let anyValid = false;
         for (const button of buttons) {
             if (!button) continue;
-            this.source.validateButton(button);
+            this.device.validateButton(button);
             anyValid = true;
         }
         if (!anyValid) {
@@ -153,12 +153,12 @@ export class BooleanMapping extends Mapping {
     /**
      * Create a new boolean mapping.
      *
-     * @param source The input source checked by this mapping.
+     * @param device The device checked by this mapping.
      * @param buttons The list of button bindings. This can be later specified
      *     using {@link BooleanMapping.buttons} or {@link BooleanMapping.setButtons}.
      */
-    constructor(source: InputSource, ...buttons: number[]) {
-        super(source);
+    constructor(device: Device, ...buttons: number[]) {
+        super(device);
         this.setButtons(...buttons);
         this.trigger = new PressTrigger();
     }
@@ -179,7 +179,7 @@ export class BooleanMapping extends Mapping {
 
     /** @inheritdoc */
     update(action: BooleanAction): boolean {
-        action.value = this.source.groupPressed(this.buttons);
+        action.value = this.device.groupPressed(this.buttons);
         return action.value;
     }
 
@@ -219,20 +219,20 @@ export class Axis2dMapping extends Mapping {
     /**
      * Create a new boolean mapping.
      *
-     * @param source The input source checked by this mapping.
+     * @param device The device checked by this mapping.
      * @param button The axis button binding. This can be later specified
      *     using {@link BooleanMapping.button} or {@link BooleanMapping.setButton}.
      */
-    constructor(source: InputSource, button: number = 0) {
-        super(source);
+    constructor(device: Device, button: number = 0) {
+        super(device);
         this.button = button;
     }
 
     /**
      * Set the axis button binding.
      *
-     * Each source has its own enumeration for axis binding. For instance,
-     * the {@link XRGamepadInput} exposes {@link XRAxisBinding}.
+     * Each device has its own enumeration for axis binding. For instance,
+     * the {@link XRDevice} exposes {@link XRAxisBinding}.
      *
      * @param button The axis button binding.
      * @returns This instance, for chaining.
@@ -244,7 +244,7 @@ export class Axis2dMapping extends Mapping {
 
     /** @inheritdoc */
     update(action: Axis2dAction): boolean {
-        return this.source.axis2d(action.value, this.button);
+        return this.device.axis2d(action.value, this.button);
     }
 
     /** @inheritdoc */
@@ -256,7 +256,7 @@ export class Axis2dMapping extends Mapping {
                     `\tAction '${action.id}' has a non-array value.`
             );
         }
-        this.source.validateAxis(this.button);
+        this.device.validateAxis(this.button);
     }
 }
 
@@ -281,7 +281,7 @@ export interface EmulatedAxis2dOptions {
  *
  * ```js
  * // Binds buttons 'W', 'A', 'S', and 'D' to a value in the range [-1; 1].
- * const mapping = new EmulatedAxis2dMapping(keyboardInput, {
+ * const mapping = new EmulatedAxis2dMapping(keyboard, {
  *     minX: KeyboardBinding.KeyA, // Negative x binding
  *     maxX: KeyboardBinding.KeyD, // Positive x binding
  *     minY: KeyboardBinding.KeyS, // Negative y binding
@@ -314,22 +314,22 @@ export class EmulatedAxis2dMapping extends Mapping {
     /**
      * Create a new emulated axis mapping.
      *
-     * @param source The input source checked by this mapping.
+     * @param device The device checked by this mapping.
      * @param buttons The list of button bindings. This can be later specified
      *     using {@link EmulatedAxis2dMapping.buttons}
      *     or {@link EmulatedAxis2dMapping.setButtons}.
      */
-    constructor(source: InputSource, options?: EmulatedAxis2dOptions) {
-        super(source);
+    constructor(device: Device, options?: EmulatedAxis2dOptions) {
+        super(device);
         if (options) this.setButtons(options);
     }
 
     /** @inheritdoc */
     update(action: Axis2dAction): boolean {
         action.value[0] =
-            -this.source.value(this.buttons[0]) + this.source.value(this.buttons[1]);
+            -this.device.value(this.buttons[0]) + this.device.value(this.buttons[1]);
         action.value[1] =
-            -this.source.value(this.buttons[2]) + this.source.value(this.buttons[3]);
+            -this.device.value(this.buttons[2]) + this.device.value(this.buttons[3]);
         return isAxisNonZero(action.value);
     }
 

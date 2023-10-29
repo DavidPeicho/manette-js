@@ -43,8 +43,9 @@ import {
     ActionManager,
     BooleanMapping,
     EmulatedAxis2dMapping,
-    MouseInputSource,
-    XRGamepadInputSource,
+    KeyboardDevice,
+    MouseDevice,
+    XRDevice,
     Handedness,
 } from 'haptic-js';
 
@@ -54,21 +55,22 @@ const fire = new BooleanAction();
 const move = new Axis2dAction();
 
 // Create devices: One mouse and two gamepads (one per controller).
-const mouse = new MouseInputSource('mouse');
-const rightGamepad = new XRGamepadInputSource('right', Handedness.Right);
-const leftGamepad = new XRGamepadInputSource('left', Handedness.Left);
+const mouse = new MouseDevice('mouse');
+const keyboard = new MouseDevice('keyboard');
+const rightGamepad = new XRDevice('right', Handedness.Right);
+const leftGamepad = new XRDevice('left', Handedness.Left);
 
 const manager = new ActionManager();
 
 // Player can fire either with the mouse, or the right controller.
 manager.add(fire, [
-    new BooleanMapping(mouseInput, MouseBinding.Primary),
+    new BooleanMapping(mouse, MouseBinding.Primary),
     new BooleanMapping(rightGamepad, XRButtonBinding.Trigger),
 ]);
 
 manager.add(move, [
     // WASD mapping to the value: [-1; 1].
-    new EmulatedAxis2dMapping(keyboardInput, {
+    new EmulatedAxis2dMapping(keyboard, {
         maxY: KeyboardBinding.KeyW,
         minX: KeyboardBinding.KeyA,
         minY: KeyboardBinding.KeyS,
@@ -80,6 +82,15 @@ manager.add(move, [
 
 // This event is triggered when a match for any of the mapping occurs.
 fire.completed.add(() => console.log('Pew!'));
+
+let previousTime = performance.now();
+function animate() {
+    const dt = performance.now() - previousTime;
+    rightGamepad.update(dt);
+    leftGamepad.update(dt);
+    window.requestAnimationFrame(animate);
+}
+animate();
 ```
 
 ## Example

@@ -11,10 +11,10 @@ import {
     DownTrigger,
     EmulatedAxis2dMapping,
     KeyboardBinding,
-    KeyboardInputSource,
+    KeyboardDevice,
     LongPressTrigger,
     MouseBinding,
-    MouseInputSource,
+    MouseDevice,
 } from 'haptic-js';
 
 import {Game} from './game.js';
@@ -35,7 +35,7 @@ function updateUI(action: Action) {
         const div = document.createElement('div');
         div.classList.add('action');
         div.innerHTML = `
-            ${action.source!.id === 'keyboard' ? keyboardSVG : mouseSVG}
+            ${action.device!.id === 'keyboard' ? keyboardSVG : mouseSVG}
             <p action-id=${action.id} count="0">Action</p>
         `;
         last = div.children[1];
@@ -51,20 +51,20 @@ const game = new Game(document.getElementsByTagName('canvas')[0]);
 window.onresize = () => game.resize();
 
 /*
- * This example contains two sources:
+ * This example contains two devices:
  *
- * - MouseInputSource
- * - KeyboardInputSource
+ * - MouseDevice
+ * - KeyboardDevice
  *
- * Sources process raw inputs from device such as mouse, keyboard,
+ * Devices process raw inputs from device such as mouse, keyboard,
  * gamepads.
  */
 
-const mouseInput = new MouseInputSource('mouse');
-mouseInput.enable(document.body);
+const mouse = new MouseDevice('mouse');
+mouse.enable(document.body);
 
-const keyboardInput = new KeyboardInputSource('keyboard');
-keyboardInput.enable(document.body);
+const keyboard = new KeyboardDevice('keyboard');
+keyboard.enable(document.body);
 
 /*
  * Action definition.
@@ -103,18 +103,18 @@ for (const action of [fire, move, reset]) {
 
 const manager = new ActionManager();
 manager.add(fire, [
-    new BooleanMapping(mouseInput, MouseBinding.Primary),
-    new BooleanMapping(keyboardInput, KeyboardBinding.Enter),
+    new BooleanMapping(mouse, MouseBinding.Primary),
+    new BooleanMapping(keyboard, KeyboardBinding.Enter),
 ]);
 manager.add(move, [
-    new EmulatedAxis2dMapping(keyboardInput, {
+    new EmulatedAxis2dMapping(keyboard, {
         // WASD to [-1; 1]
         maxY: KeyboardBinding.KeyW,
         minX: KeyboardBinding.KeyA,
         minY: KeyboardBinding.KeyS,
         maxX: KeyboardBinding.KeyD,
     }).setTrigger(new DownTrigger()),
-    new EmulatedAxis2dMapping(keyboardInput, {
+    new EmulatedAxis2dMapping(keyboard, {
         // Arrows to [-1; 1]
         maxY: KeyboardBinding.ArrowUp,
         minX: KeyboardBinding.ArrowLeft,
@@ -123,7 +123,7 @@ manager.add(move, [
     }).setTrigger(new DownTrigger()),
 ]);
 manager.add(reset, [
-    new BooleanMapping(keyboardInput, KeyboardBinding.Space).setTrigger(
+    new BooleanMapping(keyboard, KeyboardBinding.Space).setTrigger(
         new LongPressTrigger(1.0)
     ),
 ]);
@@ -141,7 +141,7 @@ function animate() {
     //
     // This is different than event-based actions, such as the `fire` one.
     game.moveSpeed = move.value[1];
-    game.update(dt, mouseInput.absolute);
+    game.update(dt, mouse.absolute);
     game.render();
 
     game.previousTime = now;

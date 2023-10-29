@@ -1,4 +1,4 @@
-import {InputSource} from './input-source/input.js';
+import {Device} from './devices/device.js';
 import {Trigger} from './trigger.js';
 import {Emitter} from './utils/event.js';
 
@@ -41,7 +41,7 @@ export enum TriggerState {
  * * {@link Axis2dAction}: axis2d value (`Float32Array`)
  *
  * When an action is evaluated, it is assigned a value coming from
- * the input source.
+ * the device.
  *
  * ## State
  *
@@ -94,8 +94,8 @@ export class Action {
      */
     readonly completed = new Emitter<[Action]>();
 
-    /** Last source that activated this action. @hidden */
-    readonly _source: InputSource | null = null;
+    /** Last device that activated this action. @hidden */
+    readonly _device: Device | null = null;
 
     /** State the action is currently in. @hidden */
     readonly _state = TriggerState.None;
@@ -112,7 +112,7 @@ export class Action {
 
     /** Reset the action state, including its value. */
     reset() {
-        (this._source as InputSource | null) = null;
+        (this._device as Device | null) = null;
     }
 
     /** Squared magnitude of the action's value. */
@@ -130,9 +130,9 @@ export class Action {
         return this._trigger;
     }
 
-    /** The last source that activated this action. */
-    get source() {
-        return this._source;
+    /** The last device that activated this action. */
+    get device() {
+        return this._device;
     }
 
     /** `true` if the action is either in a `Started` or `Ongoing` state. */

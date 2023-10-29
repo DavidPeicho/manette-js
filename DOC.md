@@ -1,6 +1,6 @@
 # Terms
 
-## InputSource
+## Device
 
 @todo
 
