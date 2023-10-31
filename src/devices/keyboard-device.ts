@@ -250,4 +250,9 @@ export class KeyboardDevice extends Device {
     get onRelease() {
         return this.#onRelease;
     }
+
+    /** HTML element processing the keyboard events. */
+    get element() {
+        return this.#element;
+    }
 }
