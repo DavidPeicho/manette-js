@@ -1,8 +1,8 @@
-import test from 'node:test';
+import assert from 'node:assert';
+import test, {describe} from 'node:test';
 
 import {KeyboardBinding, KeyboardDevice} from '../../src/devices/keyboard-device.js';
 import {HTMLElementMock} from './element-mock.js';
-import assert from 'node:assert';
 
 function create(): {keyboard: KeyboardDevice; elt: HTMLElementMock} {
     const elt = new HTMLElementMock();
@@ -11,29 +11,62 @@ function create(): {keyboard: KeyboardDevice; elt: HTMLElementMock} {
     return {keyboard, elt};
 }
 
-test('Keyboard', async (t) => {
-    await t.test('.pressed()', (_) => {
+describe('Keyboard', (_) => {
+    test('.pressed() for keydown', (_) => {
         const {keyboard, elt} = create();
         assert(!keyboard.pressed(KeyboardBinding.Space));
 
         elt.keydown('Space');
         assert(keyboard.pressed(KeyboardBinding.Space));
 
-        /* No other key should be pressed. */
+        // No other key should be pressed
         for (const key in KeyboardBinding) {
             if (key === 'Space') continue;
             assert(!keyboard.pressed(KeyboardBinding[key as keyof KeyboardBinding]));
         }
-
-        elt.keyup('Space');
-        assert(!keyboard.pressed(KeyboardBinding.Space));
     });
 
-    await t.test('.pressed() multiple keys', (_) => {
+    test('.pressed() for keyup', (_) => {
         const {keyboard, elt} = create();
-        elt.keydown('Space', 'KeyA', 'BracketLeft');
-        assert(keyboard.pressed(KeyboardBinding.Space));
-        assert(keyboard.pressed(KeyboardBinding.KeyA));
-        assert(keyboard.pressed(KeyboardBinding.BracketLeft));
+
+        // Press all keys first
+        for (const key in KeyboardBinding) {
+            elt.keydown(key);
+            assert(keyboard.pressed(KeyboardBinding[key as keyof KeyboardBinding]));
+        }
+
+        // Release a few keys
+        const keys = ['F1', 'Digit5', 'KeyA'];
+        for (const key of keys) {
+            elt.keyup(key);
+            assert(!keyboard.pressed(KeyboardBinding[key]));
+        }
+
+        // Ensure all non-released keys are still pressed
+        for (const key in KeyboardBinding) {
+            if (keys.includes(key)) continue;
+            assert(keyboard.pressed(KeyboardBinding[key as keyof KeyboardBinding]));
+        }
+    });
+
+    test('.disable()', (_) => {
+        const {keyboard, elt} = create();
+        keyboard.disable();
+
+        elt.keydown('KeyA');
+        assert(!keyboard.pressed(KeyboardBinding.KeyA));
+    });
+
+    test('.validateButton()', (_) => {
+        const {keyboard} = create();
+
+        for (const key in KeyboardBinding) {
+            assert.doesNotThrow(() => {
+                keyboard.validateButton(KeyboardBinding[key as keyof KeyboardBinding]);
+            });
+        }
+
+        assert.throws(() => keyboard.validateButton(-1 as KeyboardBinding));
+        assert.throws(() => keyboard.validateButton(10000 as KeyboardBinding));
     });
 });

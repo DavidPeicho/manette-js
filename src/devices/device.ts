@@ -4,7 +4,7 @@ import {EPSILON} from '../constants.js';
  * Base class for any device, such as a keyboard, mouse,
  * or gamepad.
  */
-export class Device {
+export class Device<ButtonBinding = number, AxisBinding = number> {
     /** Identifier of the device. @hidden */
     #id: string;
 
@@ -27,7 +27,7 @@ export class Device {
         /* @todo: Unroll */
         for (let i = 0; i < buttons.length; ++i) {
             if (!buttons[i]) continue;
-            if (!this.pressed(buttons[i])) return false;
+            if (!this.pressed(buttons[i] as ButtonBinding)) return false;
         }
         return true;
     }
@@ -37,7 +37,7 @@ export class Device {
      *
      * @returns Actuation value.
      */
-    value(button: number): number {
+    value(button: ButtonBinding): number {
         return this.pressed(button) ? 1.0 : 0.0;
     }
 
@@ -47,7 +47,7 @@ export class Device {
      * @param button Button ID to check.
      * @returns `true` if the button is pressed, `false` otherwise.
      */
-    pressed(button: number): boolean {
+    pressed(button: ButtonBinding): boolean {
         return false;
     }
 
@@ -58,7 +58,7 @@ export class Device {
      * @param button Button ID to read from.
      * @returns `true` if the axis is activated, i.e., non-zero.
      */
-    axis2d(out: Float32Array, button: number): boolean {
+    axis2d(out: Float32Array, button: AxisBinding): boolean {
         return false;
     }
 

@@ -155,12 +155,12 @@ function toBit32(bit128: number) {
  * console.log(keyboard.pressed(KeyboardBinding.Space));
  * ```
  */
-export class KeyboardDevice extends Device {
+export class KeyboardDevice extends Device<KeyboardBinding> {
     /** Bitset for pressed buttons. @hidden */
     #bitset: Int32Array = new Int32Array(4);
 
     /** HTML elements for event listeners. @hidden */
-    #element: HTMLElement | Document = null!;
+    #element: HTMLElement | null = null;
 
     /* Listeners */
 
@@ -197,10 +197,11 @@ export class KeyboardDevice extends Device {
 
     /** Disable the keyboard listeners. */
     disable() {
-        const elt = this.#element as HTMLElement;
+        const elt = this.#element;
+        if (!elt) return;
         elt.removeEventListener('keydown', this.#onKeyPress);
         elt.removeEventListener('keyup', this.#onKeyRelease);
-        this.#element = document;
+        this.#element = null;
     }
 
     /** @inheritdoc */
@@ -210,7 +211,7 @@ export class KeyboardDevice extends Device {
     }
 
     /** @inheritdoc */
-    validateButton(button: number) {
+    validateButton(button: KeyboardBinding) {
         if (KeyboardBinding[button] === undefined) {
             throw new Error(
                 `Device '${this.id}' used with an invalid button.\n` +
