@@ -3,6 +3,7 @@ import test, {describe} from 'node:test';
 
 import {KeyboardBinding, KeyboardDevice} from '../../src/devices/keyboard-device.js';
 import {HTMLElementMock} from './element-mock.js';
+import {enumKeys} from '../utils.js';
 
 function create(): {keyboard: KeyboardDevice; elt: HTMLElementMock} {
     const elt = new HTMLElementMock();
@@ -20,7 +21,8 @@ describe('Keyboard', (_) => {
         assert(keyboard.pressed(KeyboardBinding.Space));
 
         // No other key should be pressed
-        for (const key in KeyboardBinding) {
+        const keys = enumKeys(KeyboardBinding);
+        for (const key of keys) {
             if (key === 'Space') continue;
             assert(!keyboard.pressed(KeyboardBinding[key as keyof KeyboardBinding]));
         }
@@ -30,21 +32,22 @@ describe('Keyboard', (_) => {
         const {keyboard, elt} = create();
 
         // Press all keys first
-        for (const key in KeyboardBinding) {
+        const keys = enumKeys(KeyboardBinding);
+        for (const key of keys) {
             elt.keydown(key);
             assert(keyboard.pressed(KeyboardBinding[key as keyof KeyboardBinding]));
         }
 
         // Release a few keys
-        const keys = ['F1', 'Digit5', 'KeyA'];
-        for (const key of keys) {
+        const release = ['F1', 'Digit5', 'KeyA'];
+        for (const key of release) {
             elt.keyup(key);
             assert(!keyboard.pressed(KeyboardBinding[key]));
         }
 
         // Ensure all non-released keys are still pressed
-        for (const key in KeyboardBinding) {
-            if (keys.includes(key)) continue;
+        for (const key of keys) {
+            if (release.includes(key)) continue;
             assert(keyboard.pressed(KeyboardBinding[key as keyof KeyboardBinding]));
         }
     });
