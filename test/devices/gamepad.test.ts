@@ -1,12 +1,7 @@
 import assert from 'node:assert';
 import test, {describe} from 'node:test';
 
-import {
-    Handedness,
-    XRButtonBinding,
-    XRDevice,
-    toRawButton,
-} from '../../src/devices/xr-device.js';
+import {Handedness, XRButtonBinding, XRDevice} from '../../src/devices/xr-device.js';
 import {enumKeys} from '../utils.js';
 import {XRGamepadMock, XRSessionMock} from './xr-session-mock.js';
 
@@ -22,8 +17,9 @@ function create(): {device: XRDevice; gamepad: XRGamepadMock} {
 describe('Gamepad', (_) => {
     test('.pressed() on down events', (_) => {
         const {device, gamepad} = create();
+        const buttons = gamepad.buttons;
 
-        gamepad.buttons[toRawButton(XRButtonBinding.Trigger)].pressed = true;
+        buttons[XRDevice.rawButton(XRButtonBinding.Trigger)].pressed = true;
         device.update();
         assert(device.pressed(XRButtonBinding.Trigger));
 
@@ -37,6 +33,7 @@ describe('Gamepad', (_) => {
 
     test('.pressed() on up events', (_) => {
         const {device, gamepad} = create();
+        const buttons = gamepad.buttons;
 
         const keys = enumKeys(XRButtonBinding);
 
@@ -45,7 +42,7 @@ describe('Gamepad', (_) => {
         for (const key of keys) {
             const pressed = !release.includes(key);
             const binding = XRButtonBinding[key];
-            gamepad.buttons[toRawButton(binding)].pressed = pressed;
+            buttons[XRDevice.rawButton(binding)].pressed = pressed;
         }
 
         device.update();
@@ -59,9 +56,10 @@ describe('Gamepad', (_) => {
 
     test('.disable()', (_) => {
         const {device, gamepad} = create();
+        const buttons = gamepad.buttons;
 
         device.disable();
-        gamepad.buttons[toRawButton(XRButtonBinding.Trigger)].pressed = true;
+        buttons[XRDevice.rawButton(XRButtonBinding.Trigger)].pressed = true;
         device.update();
 
         assert(!device.pressed(XRButtonBinding.Trigger));
@@ -76,7 +74,7 @@ describe('Gamepad', (_) => {
         device.enable(mock as unknown as XRSession);
 
         // Handedness doesn't match, events shouldn't be fired
-        buttons[toRawButton(XRButtonBinding.Trigger)].pressed = true;
+        buttons[XRDevice.rawButton(XRButtonBinding.Trigger)].pressed = true;
         device.update();
         assert(!device.pressed(XRButtonBinding.Trigger));
 

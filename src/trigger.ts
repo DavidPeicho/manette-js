@@ -175,7 +175,6 @@ export class LongPressTrigger extends Trigger {
 
     /** @inheritdoc */
     override _nextState(dt: number) {
-        console.log(this._timer);
         if (!this._actuated) {
             this._timer = 0.0;
             return TriggerState.None;

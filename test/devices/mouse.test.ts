@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import test, {describe} from 'node:test';
 
-import {MouseDevice, MouseBinding, toRawButton} from '../../src/devices/mouse-device.js';
+import {MouseDevice, MouseBinding} from '../../src/devices/mouse-device.js';
 import {HTMLElementMock} from './element-mock.js';
 import {enumKeys} from '../utils.js';
 
@@ -17,7 +17,7 @@ describe('Mouse', (_) => {
         const {device, elt} = create();
         assert(!device.pressed(MouseBinding.Secondary));
 
-        elt.pointerdown(toRawButton(MouseBinding.Secondary));
+        elt.pointerdown(MouseDevice.rawButton(MouseBinding.Secondary));
         assert(device.pressed(MouseBinding.Secondary));
 
         // No other button should be pressed
@@ -35,14 +35,14 @@ describe('Mouse', (_) => {
 
         // Press all button first
         for (const key of keys) {
-            elt.pointerdown(toRawButton(MouseBinding[key]));
+            elt.pointerdown(MouseDevice.rawButton(MouseBinding[key]));
         }
 
         // Release a few buttons
         const release = ['Primary', 'Fourth'];
         for (const key of release) {
             const binding = MouseBinding[key as keyof MouseBinding];
-            elt.pointerup(toRawButton(binding));
+            elt.pointerup(MouseDevice.rawButton(binding));
             assert(!device.pressed(MouseBinding[key]));
         }
 
@@ -57,7 +57,7 @@ describe('Mouse', (_) => {
         const {device, elt} = create();
         device.disable();
 
-        elt.pointerdown(toRawButton(MouseBinding.Primary));
+        elt.pointerdown(MouseDevice.rawButton(MouseBinding.Primary));
         assert(!device.pressed(MouseBinding.Primary));
     });
 

@@ -19,19 +19,6 @@ export enum MouseAxisBinding {
 }
 
 /**
- * Convert a binding to a raw button value.
- *
- * For more information about button value:
- * https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
- *
- * @param binding The binding to convert.
- * @returns A power of two representing the button value.
- */
-export function toRawButton(binding: MouseBinding) {
-    return 1 << (binding - 1);
-}
-
-/**
  * Mouse device.
  *
  * ## Usage
@@ -45,6 +32,19 @@ export function toRawButton(binding: MouseBinding) {
  * ```
  */
 export class MouseDevice extends Device<MouseBinding, MouseAxisBinding> {
+    /**
+     * Convert a binding to a raw button value.
+     *
+     * For more information about button value:
+     * https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
+     *
+     * @param binding The binding to convert.
+     * @returns A power of two representing the button value.
+     */
+    static rawButton(binding: MouseBinding) {
+        return 1 << (binding - 1);
+    }
+
     /** Bitset for pressed buttons. @hidden */
     #buttons: number = 0;
 
@@ -85,6 +85,7 @@ export class MouseDevice extends Device<MouseBinding, MouseAxisBinding> {
             e.stopPropagation();
             e.preventDefault();
         });
+        return this;
     }
 
     /** Disable the mouse listeners. */
@@ -98,7 +99,7 @@ export class MouseDevice extends Device<MouseBinding, MouseAxisBinding> {
 
     /** @inheritdoc */
     pressed(button: MouseBinding): boolean {
-        return !!(this.#buttons & toRawButton(button));
+        return !!(this.#buttons & MouseDevice.rawButton(button));
     }
 
     /** @inheritdoc */
@@ -120,6 +121,11 @@ export class MouseDevice extends Device<MouseBinding, MouseAxisBinding> {
                     `\tButton '${button}' doesn't exist on MouseBinding'`
             );
         }
+    }
+
+    /** HTML element processing the mouse events. */
+    get element() {
+        return this.#element;
     }
 
     /** Mouse coordinates, in the range [-1; 1]. */
