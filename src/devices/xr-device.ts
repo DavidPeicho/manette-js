@@ -6,7 +6,12 @@ export enum Handedness {
     Right = 1,
 }
 
-/** Binding for XR buttons. */
+/**
+ * Binding for XR buttons.
+ *
+ * This is a direct mapping to `buttons`:
+ * https://developer.mozilla.org/en-US/docs/Web/API/Gamepad/buttons
+ */
 export enum XRButtonBinding {
     Trigger = 1,
     Grip = 2,
@@ -19,6 +24,19 @@ export enum XRButtonBinding {
 export enum XRAxisBinding {
     Touchpad = 1,
     Joystick = 2,
+}
+
+/**
+ * Convert a binding to a raw button value.
+ *
+ * For more information about button value:
+ * https://developer.mozilla.org/en-US/docs/Web/API/GamepadButton
+ *
+ * @param binding The binding to convert.
+ * @returns An index representing the button value.
+ */
+export function toRawButton(binding: XRButtonBinding) {
+    return binding - 1;
 }
 
 /**
