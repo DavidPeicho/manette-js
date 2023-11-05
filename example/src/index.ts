@@ -105,26 +105,35 @@ for (const action of [fire, move, reset]) {
  */
 
 const manager = new ActionManager();
-manager.add(fire, [
-    new BooleanMapping(mouse, MouseBinding.Primary).setTrigger(new PressTrigger()),
-    new BooleanMapping(keyboard, KeyboardBinding.Enter).setTrigger(new PressTrigger()),
-]);
-manager.add(move, [
-    new EmulatedAxis2dMapping(keyboard, {
-        // WASD to [-1; 1]
-        maxY: KeyboardBinding.KeyW,
-        minX: KeyboardBinding.KeyA,
-        minY: KeyboardBinding.KeyS,
-        maxX: KeyboardBinding.KeyD,
-    }).setTrigger(new DownTrigger()),
-    new EmulatedAxis2dMapping(keyboard, {
-        // Arrows to [-1; 1]
-        maxY: KeyboardBinding.ArrowUp,
-        minX: KeyboardBinding.ArrowLeft,
-        minY: KeyboardBinding.ArrowDown,
-        maxX: KeyboardBinding.ArrowRight,
-    }).setTrigger(new DownTrigger()),
-]);
+manager.add(
+    fire,
+    [
+        new BooleanMapping(mouse, MouseBinding.Primary),
+        new BooleanMapping(keyboard, KeyboardBinding.Enter),
+    ],
+    new PressTrigger()
+);
+
+manager.add(
+    move,
+    [
+        new EmulatedAxis2dMapping(keyboard, {
+            // WASD to [-1; 1]
+            maxY: KeyboardBinding.KeyW,
+            minX: KeyboardBinding.KeyA,
+            minY: KeyboardBinding.KeyS,
+            maxX: KeyboardBinding.KeyD,
+        }).setTrigger(new DownTrigger()),
+        new EmulatedAxis2dMapping(keyboard, {
+            // Arrows to [-1; 1]
+            maxY: KeyboardBinding.ArrowUp,
+            minX: KeyboardBinding.ArrowLeft,
+            minY: KeyboardBinding.ArrowDown,
+            maxX: KeyboardBinding.ArrowRight,
+        }),
+    ],
+    new DownTrigger()
+);
 manager.add(reset, [
     new BooleanMapping(keyboard, KeyboardBinding.Space).setTrigger(
         new LongPressTrigger(1.0)

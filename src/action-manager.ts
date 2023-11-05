@@ -55,17 +55,18 @@ export class ActionManager {
      *
      * @param action The action to add.
      * @param mappings The mappings that modify the action.
+     * @param trigger Automatically assigned to mapping with no trigger.
      *
      * @returns This instance, for chaining.
      */
-    add(action: Action, mappings: Mapping[]): this {
+    add(action: Action, mappings: Mapping[], trigger?: Trigger): this {
         if (this.validate && this.index(action) !== null) {
             throw new Error(`action ${action.id} already added. Update the mapping`);
         }
         const actionId = this._actions.length;
         this._actions.push(action);
         this._mappings.push([]);
-        return this.setMapping(actionId, mappings);
+        return this.setMapping(actionId, mappings, trigger);
     }
 
     /**
@@ -107,10 +108,11 @@ export class ActionManager {
      *
      * @param actionId The action, an id, or its index in the manager.
      * @param mappings The mappings.
+     * @param trigger Automatically assigned to mapping with no trigger.
      *
      * @returns This instance, for chaining.
      */
-    setMapping(index: number, mappings: Mapping[]): this {
+    setMapping(index: number, mappings: Mapping[], trigger?: Trigger): this {
         const action = this._actions[index];
         if (!action) {
             throw new Error(`action at index '${index}' doesn't exist`);
@@ -119,6 +121,12 @@ export class ActionManager {
         if (this.validate) {
             for (const mapping of mappings) {
                 mapping.validate(action);
+            }
+        }
+
+        if (trigger) {
+            for (const mapping of mappings) {
+                mapping.trigger = mapping.trigger ?? trigger;
             }
         }
 

@@ -68,9 +68,9 @@ const manager = new ActionManager();
 
 // Player can fire either with the mouse, or the right controller.
 manager.add(fire, [
-    new BooleanMapping(mouse, MouseBinding.Primary).setTrigger(new PressTrigger()),
-    new BooleanMapping(rightGamepad, XRButtonBinding.Trigger).setTrigger(new PressTrigger()),
-]);
+    new BooleanMapping(mouse, MouseBinding.Primary),
+    new BooleanMapping(rightGamepad, XRButtonBinding.Trigger),
+], new PressTrigger());
 
 manager.add(move, [
     // WASD mapping to the value: [-1; 1].
@@ -100,7 +100,7 @@ animate();
 
 ## ToDo
 
-* [ ] Overridable trigger
+* [X] Overridable trigger
 * [ ] Serialization & Deserialization of the action manager state
 * [ ] Touch support
 
