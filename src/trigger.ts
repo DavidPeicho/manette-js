@@ -57,7 +57,7 @@ export class Trigger {
      * @param dt Elapsed time since the last call to `update`, **in seconds**.
      * @returns The new state the action is in.
      */
-    update(action: Action, dt: number): TriggerState {
+    update(action: Action, dt: number = 0.016): TriggerState {
         this._actuated = this.actuated(action);
         const state = this._nextState(dt, action);
         this._wasActuated = this._actuated;
@@ -175,7 +175,6 @@ export class LongPressTrigger extends Trigger {
 
     /** @inheritdoc */
     override _nextState(dt: number) {
-        console.log(this._timer);
         if (!this._actuated) {
             this._timer = 0.0;
             return TriggerState.None;

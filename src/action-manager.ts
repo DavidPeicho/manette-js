@@ -73,7 +73,7 @@ export class ActionManager {
      *
      * @param dt Elapsed time since the last call to `update`, **in seconds**.
      */
-    update(dt: number) {
+    update(dt: number = 0.016) {
         for (let i = 0; i < this._actions.length; ++i) {
             const mappings = this._mappings[i];
             const action = this._actions[i];
@@ -93,6 +93,7 @@ export class ActionManager {
                 this._notify(action, action.trigger.update(action, dt));
             }
 
+            (action._mapping as Mapping | null) = match;
             (action._trigger as Trigger | null) = newTrigger;
             (action._device as Device | null) = match?.device ?? null;
             this._notify(action, newTrigger?.update(action, dt) ?? TriggerState.None);

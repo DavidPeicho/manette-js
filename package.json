@@ -22,11 +22,14 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "pretty": "prettier --config ./prettierrc.json --write \"src/**/*.ts\" \"example/**/*.ts\"",
+    "test": "node --import tsx --test test/*.test.ts test/**/*test.ts",
+    "pretty": "prettier --config ./prettierrc.json --write \"src/**/*.ts\" \"test/**/*.ts\" \"example/**/*.ts\"",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
+    "@types/node": "^20.8.10",
     "prettier": "^3.0.0",
+    "tsx": "^3.14.0",
     "typescript": "^5.2.2"
   },
   "dependencies": {

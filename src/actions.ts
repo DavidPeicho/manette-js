@@ -1,4 +1,5 @@
 import {Device} from './devices/device.js';
+import {Mapping} from './mapping.js';
 import {Trigger} from './trigger.js';
 import {Emitter} from './utils/event.js';
 
@@ -105,6 +106,9 @@ export class Action {
     /** Last trigger that modified this action's state. @hidden */
     readonly _trigger: Trigger | null = null;
 
+    /** Last mapping that modified this action's state. @hidden */
+    readonly _mapping: Mapping | null = null;
+
     /** Identifier for this action. @hidden */
     private readonly _id: string;
 
@@ -130,6 +134,11 @@ export class Action {
     /** State in which the action is currently in. */
     get state() {
         return this._state;
+    }
+
+    /** Mapping that last modified this action's state. */
+    get mapping() {
+        return this._mapping;
     }
 
     /** Trigger that last modified this action's state. */

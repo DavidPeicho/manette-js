@@ -31,7 +31,20 @@ export enum MouseAxisBinding {
  * console.log(mouse.pressed(MouseBinding.Primary));
  * ```
  */
-export class MouseDevice extends Device {
+export class MouseDevice extends Device<MouseBinding, MouseAxisBinding> {
+    /**
+     * Convert a binding to a raw button value.
+     *
+     * For more information about button value:
+     * https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
+     *
+     * @param binding The binding to convert.
+     * @returns A power of two representing the button value.
+     */
+    static rawButton(binding: MouseBinding) {
+        return 1 << (binding - 1);
+    }
+
     /** Bitset for pressed buttons. @hidden */
     #buttons: number = 0;
 
@@ -42,7 +55,7 @@ export class MouseDevice extends Device {
     #mouseNDC = new Float32Array(2);
 
     /** HTML element for pointer event listeners. @hidden */
-    #element: HTMLElement = null!;
+    #element: HTMLElement | null = null;
 
     /** Triggered on mouse press. @hidden */
     #onMousePress = this._onMousePress.bind(this);
@@ -72,20 +85,21 @@ export class MouseDevice extends Device {
             e.stopPropagation();
             e.preventDefault();
         });
+        return this;
     }
 
     /** Disable the mouse listeners. */
     disable() {
-        const element = this.#element as HTMLElement;
-        element.removeEventListener('pointerdown', this.#onMousePress);
-        element.removeEventListener('pointerup', this.#onMouseRelease);
-        element.removeEventListener('pointermove', this.#onMouseMove);
+        const elt = this.#element as HTMLElement;
+        if (!elt) return;
+        elt.removeEventListener('pointerdown', this.#onMousePress);
+        elt.removeEventListener('pointerup', this.#onMouseRelease);
+        elt.removeEventListener('pointermove', this.#onMouseMove);
     }
 
     /** @inheritdoc */
     pressed(button: MouseBinding): boolean {
-        const value = button - 1;
-        return !!(this.#buttons & (1 << value));
+        return !!(this.#buttons & MouseDevice.rawButton(button));
     }
 
     /** @inheritdoc */
@@ -97,6 +111,21 @@ export class MouseDevice extends Device {
                 break;
         }
         return isAxisNonZero(out);
+    }
+
+    /** @inheritdoc */
+    validateButton(button: MouseBinding) {
+        if (MouseBinding[button] === undefined) {
+            throw new Error(
+                `Device '${this.id}' used with an invalid button.\n` +
+                    `\tButton '${button}' doesn't exist on MouseBinding'`
+            );
+        }
+    }
+
+    /** HTML element processing the mouse events. */
+    get element() {
+        return this.#element;
     }
 
     /** Mouse coordinates, in the range [-1; 1]. */
