@@ -1,5 +1,7 @@
 # manette-js
 
+[![Node.js CI](https://github.com/DavidPeicho/manette-js/actions/workflows/node.js.yml/badge.svg)](https://github.com/DavidPeicho/manette-js/actions/workflows/node.js.yml)
+
 Manette (\\ma.nɛt\\) is an action mapping library for JavaScript.
 
 > 🚧 manette-js is released as a beta until the API is stabilized 🚧
